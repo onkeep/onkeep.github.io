@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT" />
+  <meta name="keywords" content="JVM,GC,垃圾回收," />
 
 
 
@@ -79,16 +79,21 @@
 
 
 
-<meta name="description" content="Plain living and high thinking">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Para Li&#39;s Tech Blog">
-<meta property="og:url" content="http://yoursite.com/index.html">
+<meta name="description" content="体系结构程序计数器严格来说是一个数据结构，用于保存当前正在执行的程序的内存地址，由于Java是支持多线程执行的，所以程序执行的轨迹不可能一直都是线性执行。当有多个线程交叉执行时，被中断的线程的程序当前执行到哪条内存地址必然要保存下来，以便用于被中断的线程恢复执行时再按照被中断时的指令地址继续执行下去。 为了线程切换后能恢复到正确的执行位置，每个线程都需要有一个独立的程序计数器，各个线程之间计数器互">
+<meta name="keywords" content="JVM,GC,垃圾回收">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM体系结构">
+<meta property="og:url" content="http://yoursite.com/2017/01/03/jvm/index.html">
 <meta property="og:site_name" content="Para Li&#39;s Tech Blog">
-<meta property="og:description" content="Plain living and high thinking">
+<meta property="og:description" content="体系结构程序计数器严格来说是一个数据结构，用于保存当前正在执行的程序的内存地址，由于Java是支持多线程执行的，所以程序执行的轨迹不可能一直都是线性执行。当有多个线程交叉执行时，被中断的线程的程序当前执行到哪条内存地址必然要保存下来，以便用于被中断的线程恢复执行时再按照被中断时的指令地址继续执行下去。 为了线程切换后能恢复到正确的执行位置，每个线程都需要有一个独立的程序计数器，各个线程之间计数器互">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/jvm/1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/jvm/2.jpg">
+<meta property="og:updated_time" content="2018-02-12T09:07:27.404Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Para Li&#39;s Tech Blog">
-<meta name="twitter:description" content="Plain living and high thinking">
+<meta name="twitter:title" content="JVM体系结构">
+<meta name="twitter:description" content="体系结构程序计数器严格来说是一个数据结构，用于保存当前正在执行的程序的内存地址，由于Java是支持多线程执行的，所以程序执行的轨迹不可能一直都是线性执行。当有多个线程交叉执行时，被中断的线程的程序当前执行到哪条内存地址必然要保存下来，以便用于被中断的线程恢复执行时再按照被中断时的指令地址继续执行下去。 为了线程切换后能恢复到正确的执行位置，每个线程都需要有一个独立的程序计数器，各个线程之间计数器互">
+<meta name="twitter:image" content="http://yoursite.com/images/jvm/1.jpg">
 
 
 
@@ -118,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/01/03/jvm/"/>
 
 
 
 
 
-  <title>Para Li's Tech Blog</title>
+  <title>JVM体系结构 | Para Li's Tech Blog</title>
   
 
 
@@ -143,8 +148,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -257,9 +261,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -289,9 +293,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/01/03/jvm/" itemprop="url">JVM体系结构</a></h1>
+          <h1 class="post-title" itemprop="name headline">JVM体系结构</h1>
         
 
         <div class="post-meta">
@@ -363,9 +365,7 @@
       
 
       
-        
-          
-            <h1 id="体系结构"><a href="#体系结构" class="headerlink" title="体系结构"></a>体系结构</h1><h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><p>严格来说是一个数据结构，用于保存当前正在执行的程序的内存地址，由于Java是支持多线程执行的，所以程序执行的轨迹不可能一直都是线性执行。当有多个线程交叉执行时，被中断的线程的程序当前执行到哪条内存地址必然要保存下来，以便用于被中断的线程恢复执行时再按照被中断时的指令地址继续执行下去。 为了线程切换后能恢复到正确的执行位置，每个线程都需要有一个独立的程序计数器，各个线程之间计数器互不影响，独立存储，我们称这类内存区域为“线程私有”的内存</p>
+        <h1 id="体系结构"><a href="#体系结构" class="headerlink" title="体系结构"></a>体系结构</h1><h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><p>严格来说是一个数据结构，用于保存当前正在执行的程序的内存地址，由于Java是支持多线程执行的，所以程序执行的轨迹不可能一直都是线性执行。当有多个线程交叉执行时，被中断的线程的程序当前执行到哪条内存地址必然要保存下来，以便用于被中断的线程恢复执行时再按照被中断时的指令地址继续执行下去。 为了线程切换后能恢复到正确的执行位置，每个线程都需要有一个独立的程序计数器，各个线程之间计数器互不影响，独立存储，我们称这类内存区域为“线程私有”的内存</p>
 <p>  ● 当前线程所执行的字节码的行号指示器，一个处理器只会执行一条线程中的指令，因此，为了保证线程切换后能恢复到正确的执行位置，我们称这类内存区域为“线程私有”的内存<br>  ● 如果执行的是java方法，这个计数器记录的是正在执行的虚拟机字节码指令的地址<br>  ● 如果是Native方法，则为空<br>  ● 线程独享的</p>
 <h2 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h2><p>  ● 线程共享的<br>  ● 唯一目的就是存放实例对象，所有通过new创建的对象的内存都在堆中分配<br>  ● 堆被划分为新生代和旧生代，新生代又被进一步划分为Eden和Survivor区，最后Survivor由From Space和To Space组成，结构图如下所示：</p>
 <p>  <img src="/images/jvm/1.jpg" alt=""></p>
@@ -396,14 +396,20 @@
 <h1 id="常量池的内存分配"><a href="#常量池的内存分配" class="headerlink" title="常量池的内存分配"></a>常量池的内存分配</h1><p>在 JDK6、7、8中有不同的实现：<br>1、JDK6及之前版本中，常量池的内存在永久代PermGen进行分配，所以常量池会受到PermGen内存大小的限制。<br>2、JDK7中，常量池的内存在Java堆上进行分配，意味着常量池不受固定大小的限制了。<br>3、JDK8中，虚拟机团队移除了永久代PermGen。 MetaSpace元空间</p>
 <p>JDK7之前的HotSpot，字符串常量池的字符串被存储在永久代中，因此可能导致一系列的性能问题和内存溢出错误。<br>在JDK8中，字符串常量池中只保存字符串的引用。</p>
 
-          
-        
       
     </div>
     
     
     
 
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
     
 
     
@@ -412,14 +418,24 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/JVM/" rel="tag"># JVM</a>
+          
+            <a href="/tags/GC/" rel="tag"># GC</a>
+          
+            <a href="/tags/垃圾回收/" rel="tag"># 垃圾回收</a>
+          
+        </div>
+      
+
+      
+      
+      
 
       
 
       
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -429,10 +445,11 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -440,6 +457,10 @@
 
 
           
+
+  
+
+
 
         </div>
         
@@ -460,8 +481,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -575,6 +605,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#体系结构"><span class="nav-number">1.</span> <span class="nav-text">体系结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#程序计数器"><span class="nav-number">1.1.</span> <span class="nav-text">程序计数器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#堆"><span class="nav-number">1.2.</span> <span class="nav-text">堆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法区"><span class="nav-number">1.3.</span> <span class="nav-text">方法区</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行时常量池"><span class="nav-number">1.4.</span> <span class="nav-text">运行时常量池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#虚拟机栈"><span class="nav-number">1.5.</span> <span class="nav-text">虚拟机栈</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地方法栈"><span class="nav-number">1.6.</span> <span class="nav-text">本地方法栈</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对象的创建"><span class="nav-number">2.</span> <span class="nav-text">对象的创建</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#指针碰撞法"><span class="nav-number">2.1.</span> <span class="nav-text">指针碰撞法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#空闲列表法"><span class="nav-number">2.2.</span> <span class="nav-text">空闲列表法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对象的内存布局"><span class="nav-number">3.</span> <span class="nav-text">对象的内存布局</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对象头（Header）"><span class="nav-number">3.1.</span> <span class="nav-text">对象头（Header）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例数据（Instance-Data）"><span class="nav-number">3.2.</span> <span class="nav-text">实例数据（Instance Data）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对齐填充（Padding）"><span class="nav-number">3.3.</span> <span class="nav-text">对齐填充（Padding）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#对象的访问定位"><span class="nav-number">4.</span> <span class="nav-text">对象的访问定位</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#句柄访问"><span class="nav-number">4.1.</span> <span class="nav-text">句柄访问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#直接指针"><span class="nav-number">4.2.</span> <span class="nav-text">直接指针</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#优势比较"><span class="nav-number">4.3.</span> <span class="nav-text">优势比较</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#申请一块内存的过程"><span class="nav-number">5.</span> <span class="nav-text">申请一块内存的过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JVM相关配置"><span class="nav-number">6.</span> <span class="nav-text">JVM相关配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#堆："><span class="nav-number">6.1.</span> <span class="nav-text">堆：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#栈："><span class="nav-number">6.2.</span> <span class="nav-text">栈：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新生代："><span class="nav-number">6.3.</span> <span class="nav-text">新生代：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#比例："><span class="nav-number">6.4.</span> <span class="nav-text">比例：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#持久代："><span class="nav-number">6.5.</span> <span class="nav-text">持久代：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XX-MetaspaceSize-元空间"><span class="nav-number">7.</span> <span class="nav-text">XX:MetaspaceSize 元空间</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常量池的内存分配"><span class="nav-number">8.</span> <span class="nav-text">常量池的内存分配</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -715,6 +761,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
