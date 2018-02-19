@@ -272,7 +272,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/04/rwlock/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/17/singleton/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -291,7 +291,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/04/rwlock/" itemprop="url">ReadWriteLock</a></h1>
+                <a class="post-title-link" href="/2017/02/17/singleton/" itemprop="url">单例模式</a></h1>
         
 
         <div class="post-meta">
@@ -303,8 +303,300 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-04T12:22:00+08:00">
-                2017-02-04
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-17T19:25:22+08:00">
+                2017-02-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/基础知识/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="饿汉模式"><a href="#饿汉模式" class="headerlink" title="饿汉模式"></a>饿汉模式</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> instance;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/17/singleton/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/13/transaction/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/13/transaction/" itemprop="url">事务</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-13T17:28:28+08:00">
+                2017-02-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/基础知识/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="分布式遇到的问题："><a href="#分布式遇到的问题：" class="headerlink" title="分布式遇到的问题："></a>分布式遇到的问题：</h1><p>1、通信异常<br>2、网络分区（脑裂）<br>3、三态（成功、失败<br>4、节点故障<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/13/transaction/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/12/Semaphore/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/12/Semaphore/" itemprop="url">Semaphore</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-12T14:11:56+08:00">
+                2017-02-12
               </time>
             
 
@@ -364,11 +656,10 @@
 
       
         
-          <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>ReadWriteLock接口<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ReadWriteLock</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获取读锁   </span></span><br><span class="line">    <span class="function">Lock <span class="title">readLock</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">//获取写锁</span></span><br><span class="line">    <span class="function">Lock <span class="title">writeLock</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>由于state是个32位的int值，因此可以利用位运算把这32位的state分为两个16位的无符号short来分别存储读锁和写锁的计数。<br>高16位：共享锁的计数<br>低16位：独占锁的计数<br>
+          <h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><p>Semaphore可以用来做流量分流，特别是对公共资源有限的场景，比如数据库连接。<br>假设有这个的需求，读取几万个文件的数据到数据库中，由于文件读取是IO密集型任务，可以启动几十个线程并发读取，但是数据库连接数只有10个，这时就必须控制最多只有10个线程能够拿到数据库连接进行操作。这个时候，就可以使用Semaphore做流量控制<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/04/rwlock/#more" rel="contents">
+            <a class="btn" href="/2017/02/12/Semaphore/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -419,7 +710,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/03/BlockingQueue/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/11/ReentrantLock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -438,7 +729,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/03/BlockingQueue/" itemprop="url">BlockingQueue</a></h1>
+                <a class="post-title-link" href="/2017/02/11/ReentrantLock/" itemprop="url">ReentrantLock</a></h1>
         
 
         <div class="post-meta">
@@ -450,8 +741,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-03T11:06:00+08:00">
-                2017-02-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-11T15:14:24+08:00">
+                2017-02-11
               </time>
             
 
@@ -511,10 +802,10 @@
 
       
         
-          <h1 id="方法介绍"><a href="#方法介绍" class="headerlink" title="方法介绍"></a>方法介绍</h1><p><img src="/images/pasted-12.png" alt="upload successful"><br>四组不同的行为方式解释：<br>  ● 抛异常：如果试图的操作无法立即执行，抛一个异常。<br>  ● 特定值：如果试图的操作无法立即执行，返回一个特定的值(常常是 true / false)。<br>  ● 阻塞：如果试图的操作无法立即执行，该方法调用将会发生阻塞，直到能够执行。<br>  ● 超时：如果试图的操作无法立即执行，该方法调用将会发生阻塞，直到能够执行，但等待时间不会超过给定值。返回一个特定值以告知该操作是否成功(典型的是true / false)。<br>
+          <h1 id="继承关系"><a href="#继承关系" class="headerlink" title="继承关系"></a>继承关系</h1><p>abstract static class Sync extends AbstractQueuedSynchronizer<br>Sync继承 AQS（AbstractQueuedSynchronizer）<br>FairSync（公平锁）、NonfairySync（非公平锁）是Sync的子类。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/03/BlockingQueue/#more" rel="contents">
+            <a class="btn" href="/2017/02/11/ReentrantLock/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -565,7 +856,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/02/Thread/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/10/AQS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -584,7 +875,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/02/Thread/" itemprop="url">Thread</a></h1>
+                <a class="post-title-link" href="/2017/02/10/AQS/" itemprop="url">AQS</a></h1>
         
 
         <div class="post-meta">
@@ -596,8 +887,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-02T11:24:24+08:00">
-                2017-02-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-10T07:54:00+08:00">
+                2017-02-10
               </time>
             
 
@@ -657,11 +948,10 @@
 
       
         
-          <h1 id="线程的几种状态"><a href="#线程的几种状态" class="headerlink" title="线程的几种状态"></a>线程的几种状态</h1><p>一般锁有4种状态：无锁状态，偏向锁状态，轻量级锁状态，重量级锁状态</p>
-<p><img src="/images/pasted-10.png" alt="upload successful"><br>new runnable  terminated<br>blocked waiting time_waiting</p>
+          <h1 id="Unsafe类"><a href="#Unsafe类" class="headerlink" title="Unsafe类"></a>Unsafe类</h1><p>Java最初被设计为一种安全的受控环境。尽管如此，HotSpot还是包含了一个后门sun.misc.Unsafe，提供了一些可以直接操控内存和线程的底层操作。<br>一些有用的方法<br>  1.objectFieldOffset：能够获取到指定实例变量的在对象内存中的偏移量<br>long offset = UNSAFE.objectFieldOffset(UnsafeTest.class.getDeclaredField(“state”));<br>  2.compareAndSwapInt：通过比较并替换的机制，修改指定偏移量内存的值<br>UNSAFE.compareAndSwapInt(unsafeTest, offset, 0, 1)<br>  3.park：挂起某一线程<br>  4.unpark：唤醒某一线程<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/02/Thread/#more" rel="contents">
+            <a class="btn" href="/2017/02/10/AQS/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -712,7 +1002,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/01/condition/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/09/CyclicBarrier/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -731,7 +1021,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/01/condition/" itemprop="url">Condition</a></h1>
+                <a class="post-title-link" href="/2017/02/09/CyclicBarrier/" itemprop="url">CyclicBarrier</a></h1>
         
 
         <div class="post-meta">
@@ -743,8 +1033,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-01T11:54:00+08:00">
-                2017-02-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-09T14:38:22+08:00">
+                2017-02-09
               </time>
             
 
@@ -804,10 +1094,10 @@
 
       
         
-          <h1 id="ConditionObject组成"><a href="#ConditionObject组成" class="headerlink" title="ConditionObject组成"></a>ConditionObject组成</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConditionObject</span> <span class="keyword">implements</span> <span class="title">Condition</span>, <span class="title">java</span>.<span class="title">io</span>.<span class="title">Serializable</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1173984872572414699L</span>;</span><br><span class="line">        <span class="comment">/** First node of condition queue. */</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">transient</span> Node firstWaiter;</span><br><span class="line">        <span class="comment">/** Last node of condition queue. */</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">transient</span> Node lastWaiter;</span><br><span class="line">         </span><br><span class="line">        ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <h1 id="Lock"><a href="#Lock" class="headerlink" title="Lock"></a>Lock</h1><p>Lock和synchronized是对应的，Condition和Object的监控方法（wait、notify）是对应的<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/01/condition/#more" rel="contents">
+            <a class="btn" href="/2017/02/09/CyclicBarrier/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -858,7 +1148,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/27/ConcurrentHashMap/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/08/ThreadPoolExecutor/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -877,7 +1167,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/27/ConcurrentHashMap/" itemprop="url">ConcurrentHashMap</a></h1>
+                <a class="post-title-link" href="/2017/02/08/ThreadPoolExecutor/" itemprop="url">ThreadPoolExecutor</a></h1>
         
 
         <div class="post-meta">
@@ -889,8 +1179,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-27T21:24:10+08:00">
-                2017-01-27
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-08T19:11:50+08:00">
+                2017-02-08
               </time>
             
 
@@ -912,8 +1202,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集合/" itemprop="url" rel="index">
-                    <span itemprop="name">集合</span>
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
                   </a>
                 </span>
 
@@ -950,10 +1240,10 @@
 
       
         
-          <h1 id="Hashtable-和-ConcurrentHashMap比较："><a href="#Hashtable-和-ConcurrentHashMap比较：" class="headerlink" title="Hashtable 和 ConcurrentHashMap比较："></a>Hashtable 和 ConcurrentHashMap比较：</h1><p>相同点：<br>     Hashtable 和 ConcurrentHashMap都是线程安全的，可以在多线程环境中运行； key跟value都不能是null。它们都可以用于多线程的环境。<br>不同点：<br>    1、Hashtable的大小增加到一定的时候，性能会急剧下降，因为迭代时需要被锁定很长的时间。因为ConcurrentHashMap引入了分割(segmentation)，不论它变得多么大，仅仅需要锁定map的某个部分，而其它的线程不需要等到迭代完成才能访问map。简而言之，在迭代的过程中，ConcurrentHashMap仅仅锁定map的某个部分，而Hashtable则会锁定整个map。<br>
+          <h1 id="为什么要用线程池"><a href="#为什么要用线程池" class="headerlink" title="为什么要用线程池"></a>为什么要用线程池</h1><p>1.降低资源消耗。<br>2.提高响应速度。<br>3.提高线程的可管理性。<br>3.减少了创建和销毁线程的次数，每个工作线程都可以被重复利用，可执行多个任务。<br>4.可以根据系统的承受能力，调整线程池中工作线线程的数目，防止因为消耗过多的内存，而把服务器累趴下<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/27/ConcurrentHashMap/#more" rel="contents">
+            <a class="btn" href="/2017/02/08/ThreadPoolExecutor/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1004,7 +1294,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/25/HashMap/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/07/volatile/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1023,7 +1313,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/25/HashMap/" itemprop="url">HashMap</a></h1>
+                <a class="post-title-link" href="/2017/02/07/volatile/" itemprop="url">volatile</a></h1>
         
 
         <div class="post-meta">
@@ -1035,8 +1325,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-25T13:15:15+08:00">
-                2017-01-25
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-07T18:14:55+08:00">
+                2017-02-07
               </time>
             
 
@@ -1058,8 +1348,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集合/" itemprop="url" rel="index">
-                    <span itemprop="name">集合</span>
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
                   </a>
                 </span>
 
@@ -1096,11 +1386,10 @@
 
       
         
-          <h1 id="为什么size是2的n次幂？"><a href="#为什么size是2的n次幂？" class="headerlink" title="为什么size是2的n次幂？"></a>为什么size是2的n次幂？</h1><p>当数组长度为2的n次幂的时候，不同的key算得index相同的几率较小，那么数据在数组上分布就比较均匀，也就是说碰撞的几率小，相对的，查询的时候就不用遍历某个位置上的链表，这样查询效率也就较高了。</p>
-<h1 id="Table和Map的区别"><a href="#Table和Map的区别" class="headerlink" title="Table和Map的区别"></a>Table和Map的区别</h1><p>HashTable 初始容量11 扩容2n+1<br>HashMap 初始容量16 扩容2n<br>
+          <h1 id="Happens-Before原则"><a href="#Happens-Before原则" class="headerlink" title="Happens-Before原则"></a>Happens-Before原则</h1><p>下面就来具体介绍下（先行发生原则）：<br>  ● 程序次序规则：一个线程内，按照代码顺序，书写在前面的操作先行发生于书写在后面的操作<br>  ● 锁定规则：一个unLock操作先行发生于后面对同一个锁的lock操作<br>  ● volatile变量规则：对一个变量的写操作先行发生于后面对这个变量的读操作<br>  ● 传递规则：如果操作A先行发生于操作B，而操作B又先行发生于操作C，则可以得出操作A先行发生于操作C<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/25/HashMap/#more" rel="contents">
+            <a class="btn" href="/2017/02/07/volatile/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1151,7 +1440,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/23/Collection/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/06/futuretask/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1170,7 +1459,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/23/Collection/" itemprop="url">Collection</a></h1>
+                <a class="post-title-link" href="/2017/02/06/futuretask/" itemprop="url">futuretask</a></h1>
         
 
         <div class="post-meta">
@@ -1182,8 +1471,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-23T13:21:44+08:00">
-                2017-01-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-06T08:24:11+08:00">
+                2017-02-06
               </time>
             
 
@@ -1205,8 +1494,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集合/" itemprop="url" rel="index">
-                    <span itemprop="name">集合</span>
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
                   </a>
                 </span>
 
@@ -1243,10 +1532,10 @@
 
       
         
-          <h1 id="继承关系"><a href="#继承关系" class="headerlink" title="继承关系"></a>继承关系</h1><p>Collection&lt;–List&lt;–AbstractList&lt;–Vector<br>Collection&lt;–List&lt;–AbstractList&lt;–ArrayList<br>Collection&lt;–List&lt;–AbstractList&lt;–AbstractSequential&lt;–LinkedList<br>
+          <h1 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h1><p> 就是对于具体的Runnable或者Callable任务的执行结果进行取消、查询是否完成、获取结果。必要时可以通过get方法获取执行结果，该方法会阻塞直到任务返回结果。<br> <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">cancel</span><span class="params">(<span class="keyword">boolean</span> mayInterruptIfRunning)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isCancelled</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isDone</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">V <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException, ExecutionException</span>;</span><br><span class="line">    <span class="function">V <span class="title">get</span><span class="params">(<span class="keyword">long</span> timeout, TimeUnit unit)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> InterruptedException, ExecutionException, TimeoutException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/23/Collection/#more" rel="contents">
+            <a class="btn" href="/2017/02/06/futuretask/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1297,7 +1586,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/21/CopyOnWriteArrayList/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/05/ThreadLocal/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1316,7 +1605,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/21/CopyOnWriteArrayList/" itemprop="url">CopyOnWriteArrayList</a></h1>
+                <a class="post-title-link" href="/2017/02/05/ThreadLocal/" itemprop="url">ThreadLocal</a></h1>
         
 
         <div class="post-meta">
@@ -1328,8 +1617,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-21T12:21:40+08:00">
-                2017-01-21
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-05T14:18:00+08:00">
+                2017-02-05
               </time>
             
 
@@ -1351,8 +1640,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集合/" itemprop="url" rel="index">
-                    <span itemprop="name">集合</span>
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
                   </a>
                 </span>
 
@@ -1389,303 +1678,10 @@
 
       
         
-          <h1 id="特点："><a href="#特点：" class="headerlink" title="特点："></a>特点：</h1><p>1、CopyOnWrite并发容器用于读多写少的并发场景。<br>2、CopyOnWrite容器只能保证数据的最终一致性，不能保证数据的实时一致性<br>3、CopyOnWriteArrayList来做容器。这个类和ArrayList最大的区别就是add(E) 的时候。容器会自动copy一份出来然后再尾部add(E)。看源码：<br>4、CopyOnWriteArrayList和CopyOnWriteArraySet分别代替List和Set，主要是在遍历操作为主的情况下来代替同步的List和同步的Set，这也就是上面所述的思路：迭代过程要保证不出错，除了加锁，另外一种方法就是”克隆”容器对象。<br>
+          <h1 id="内存泄露"><a href="#内存泄露" class="headerlink" title="内存泄露"></a>内存泄露</h1><p>如果使用ThreadLocal的set方法之后，没有显示的调用remove方法，就有可能发生内存泄露，所以养成良好的编程习惯十分重要，使用完ThreadLocal之后，记得调用remove方法。<br>ThreadLocal可能导致内存泄漏，为什么？<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Entry</span> <span class="keyword">extends</span> <span class="title">WeakReference</span>&lt;<span class="title">ThreadLocal</span>&lt;?&gt;&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/** The value associated with this ThreadLocal. */</span></span><br><span class="line">    Object value;</span><br><span class="line"></span><br><span class="line">    Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">        <span class="keyword">super</span>(k);</span><br><span class="line">        value = v;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/21/CopyOnWriteArrayList/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/19/LinkList/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Para Li">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Para Li's Tech Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/01/19/LinkList/" itemprop="url">LinkList</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-19T15:24:33+08:00">
-                2017-01-19
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集合/" itemprop="url" rel="index">
-                    <span itemprop="name">集合</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>LinkedList与ArrayList一样实现List接口，只是ArrayList是List接口的大小可变数组的实现，LinkedList是List接口链表的实现。基于链表实现的方式使得LinkedList在插入和删除时更优于ArrayList，而随机访问则比ArrayList逊色些。<br>       LinkedList实现所有可选的列表操作，并允许所有的元素包括null。<br>除了实现 List 接口外，LinkedList 类还为在列表的开头及结尾 get、remove 和 insert 元素提供了统一的命名方法。这些操作允许将链接列表用作堆栈、队列或双端队列。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/01/19/LinkList/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/17/ArrayList/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Para Li">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Para Li's Tech Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2017/01/17/ArrayList/" itemprop="url">ArrayList</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-17T23:44:00+08:00">
-                2017-01-17
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集合/" itemprop="url" rel="index">
-                    <span itemprop="name">集合</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>如果我们在知道ArrayList想装多少个元素的情况下，却没有指定容器大小，则就会导致ArrayList频繁触发扩容机制，频繁进行底层数组之间的数据复制，大大降低使用效率。</p>
-<p>ArrayList是实现List接口的动态数组，所谓动态就是它的大小是可变的。实现了所有可选列表操作，并允许包括 null 在内的所有元素。除了实现 List 接口外，此类还提供一些方法来操作内部用来存储列表的数组的大小。<br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2017/01/17/ArrayList/#more" rel="contents">
+            <a class="btn" href="/2017/02/05/ThreadLocal/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1727,7 +1723,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1777,7 +1773,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">27</span>
+                  <span class="site-state-item-count">37</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1788,7 +1784,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1799,7 +1795,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">13</span>
+                  <span class="site-state-item-count">17</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

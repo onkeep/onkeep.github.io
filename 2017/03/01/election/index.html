@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="zookeeper," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ZAB协议 Zookeeper Atomic Broadcast   Zookeeper 客户端会随机连接到 Zookeeper 集群的一个节点，如果是读请求，就直接从当前节点中读取数据；如果是写请求，那么节点就会向 leader 提交事务，leader 会广播事务，只要有超过半数节点写入成功，该写请求就会被提交（类 2PC 协议）">
+<meta name="keywords" content="zookeeper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Leader选举 ZAB协议 FastLeaderElection">
+<meta property="og:url" content="http://yoursite.com/2017/03/01/election/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="ZAB协议 Zookeeper Atomic Broadcast   Zookeeper 客户端会随机连接到 Zookeeper 集群的一个节点，如果是读请求，就直接从当前节点中读取数据；如果是写请求，那么节点就会向 leader 提交事务，leader 会广播事务，只要有超过半数节点写入成功，该写请求就会被提交（类 2PC 协议）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-19T14:15:15.569Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Leader选举 ZAB协议 FastLeaderElection">
+<meta name="twitter:description" content="ZAB协议 Zookeeper Atomic Broadcast   Zookeeper 客户端会随机连接到 Zookeeper 集群的一个节点，如果是读请求，就直接从当前节点中读取数据；如果是写请求，那么节点就会向 leader 提交事务，leader 会广播事务，只要有超过半数节点写入成功，该写请求就会被提交（类 2PC 协议）">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/03/01/election/"/>
+
+
+
+
+
+  <title>Leader选举 ZAB协议 FastLeaderElection | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-search">
+          <a href="/search" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-search"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/01/election/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Leader选举 ZAB协议 FastLeaderElection</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-01T11:20:00+08:00">
+                2017-03-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/中间件/" itemprop="url" rel="index">
+                    <span itemprop="name">中间件</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ZAB协议-Zookeeper-Atomic-Broadcast"><a href="#ZAB协议-Zookeeper-Atomic-Broadcast" class="headerlink" title="ZAB协议 Zookeeper Atomic Broadcast"></a>ZAB协议 Zookeeper Atomic Broadcast</h1><p>   Zookeeper 客户端会随机连接到 Zookeeper 集群的一个节点，<br>如果是读请求，就直接从当前节点中读取数据；<br>如果是写请求，那么节点就会向 leader 提交事务，leader 会广播事务，只要有超过半数节点写入成功，该写请求就会被提交（类 2PC 协议）<br><a id="more"></a><br>1、发起一个proposal给所有的follower<br>2、follower收到后对leader反馈<br>3、一旦收到有超过半数的反馈之后<br>4、leader发起一个commit，将所有follower收到的proposal进行提交</p>
+<h1 id="ZAB协议三种角色"><a href="#ZAB协议三种角色" class="headerlink" title="ZAB协议三种角色"></a>ZAB协议三种角色</h1><p>Leader,Follower,Observer</p>
+<h2 id="Leader"><a href="#Leader" class="headerlink" title="Leader"></a>Leader</h2><p>事务请求的唯一调度和处理者，保证集群事务处理的顺序性<br>集群内部各服务器的调度者</p>
+<h2 id="Follower"><a href="#Follower" class="headerlink" title="Follower"></a>Follower</h2><p>处理客户端的非事务请求，转发事务请求到Leader服务器<br>参与事务请求的proposal的投票<br>参与leader的选举</p>
+<h2 id="Observer"><a href="#Observer" class="headerlink" title="Observer"></a>Observer</h2><p>处理客户端的非事务请求，转发事务请求到Leader服务器<br>不参与proposal的投票和leader的选举</p>
+<h1 id="ZAB-中的节点有四种状态"><a href="#ZAB-中的节点有四种状态" class="headerlink" title="ZAB 中的节点有四种状态"></a>ZAB 中的节点有四种状态</h1><h2 id="Leading"><a href="#Leading" class="headerlink" title="Leading"></a>Leading</h2><p>当前节点是 leader，负责协调事务，对Follower的投票进行决议，将状态和follower进行同步</p>
+<h2 id="Following"><a href="#Following" class="headerlink" title="Following"></a>Following</h2><p>当前节点是跟随者，服从 leader 节点的命令，接收leader的proposal ，进行投票。并和leader进行状态同步</p>
+<h2 id="Looking"><a href="#Looking" class="headerlink" title="Looking"></a>Looking</h2><p>节点处于选举状态，在looking的时候会向集群中所有其他机器发送消息，寻找状态，这个状态不知道谁是leader，会发起leader选举</p>
+<h2 id="Observing"><a href="#Observing" class="headerlink" title="Observing"></a>Observing</h2><p>观察状态，这时候observer会观察leader是否有改变，然后同步leader的状态；</p>
+<p>electionEpoch：每执行一次leader选举，electionEpoch就会自增，用来标记leader选举的轮次<br>peerEpoch：每次leader选举完成之后，都会选举出一个新的peerEpoch，用来标记事务请求所属的轮次<br>zxid：事务请求的唯一标记，由leader服务器负责进行分配。由2部分构成，高32位是上述的peerEpoch，低32位是请求的计数，从0开始。所以由zxid我们就可以知道该请求是哪个轮次的，并且是该轮次的第几个请求。<br>lastProcessedZxid：最后一次commit的事务请求的zxid</p>
+<h1 id="Zxid-和-Quorum介绍"><a href="#Zxid-和-Quorum介绍" class="headerlink" title="Zxid 和 Quorum介绍"></a>Zxid 和 Quorum介绍</h1><h2 id="quorum"><a href="#quorum" class="headerlink" title="quorum"></a>quorum</h2><p>集群中超过半数的节点集合 = (n/2+1)，如果集群数量是3，那么quorum=2<br>理解了Quorums就不难理解为什么集群中的节点数一般配置为奇数。节点数配置成奇数的集群的容忍度更高。<br>比如3个节点的集群，Quorums = 2, 也就是说集群可以容忍1个节点失效，这时候还能选举出1个lead，集群还可用<br>比如4个节点的集群，它的Quorums = 3，Quorums要超过3，相当于集群的容忍度还是1，如果2个节点失效，那么整个集群还是无效的<br>所以4个节点的集群的容忍度 = 3个节点的集群的容忍度，但是4个节点的集群多了1个节点，相当于浪费了资源。</p>
+<h1 id="ZAB协议实现-Fast-Leader-Election"><a href="#ZAB协议实现-Fast-Leader-Election" class="headerlink" title="ZAB协议实现 Fast Leader Election"></a>ZAB协议实现 Fast Leader Election</h1><h2 id="Phase-0-Leader-election-选举阶段）"><a href="#Phase-0-Leader-election-选举阶段）" class="headerlink" title="Phase 0: Leader election (选举阶段）"></a>Phase 0: Leader election (选举阶段）</h2><p>节点在一开始都处于选举阶段，只要有一个节点得到超半数节点的票数，它就可以当选准leader 只有到达Phase 3 准leader才会成为真正的leader, 这一阶段的目的是就是为了选 出一个准leader,然后进入下一个阶段。协议并没有规定详细的选莘算法，后面我们提到实现中使用的Fast Leader Election。</p>
+<h2 id="Phase-1-Discovery-发现阶fS"><a href="#Phase-1-Discovery-发现阶fS" class="headerlink" title="Phase 1: Discovery (发现阶fS )"></a>Phase 1: Discovery (发现阶fS )</h2><p>在这个阶段，followers跟准leader进行通信，同步followers最近接收的事务提议，这个阶段的主要目的是发现当前大多数节点接收的最新提议，并且准leader生成新的epoch ,让 followers接受更新它们的 acceptedEpoch </p>
+<h2 id="Phase-2-Synchronization-同步阶段）"><a href="#Phase-2-Synchronization-同步阶段）" class="headerlink" title="Phase 2: Synchronization (同步阶段）"></a>Phase 2: Synchronization (同步阶段）</h2><p>同步阶段主要是利用leader前一阶段获得的最新提交提议历史 ，同步集群中所有的副本。只有当quorum都同步完成，准leader才会成为真正的leader。follower 只会接收zxid比自己的lastZxid大的提议， </p>
+<h2 id="Phase-3-Broadcast-广播阶段）"><a href="#Phase-3-Broadcast-广播阶段）" class="headerlink" title="Phase 3: Broadcast (广播阶段）"></a>Phase 3: Broadcast (广播阶段）</h2><p>到了这个阶段，Zookeeper集群才能正式对外提供亊务服务，并且leader可以进行消息广插，同时如果有新的节点加入，还需要对新节点进行同步。</p>
+<p>   协议的 Java 版本实现跟上面的定义有些不同，选举阶段使用的是 Fast Leader Election（FLE），它包含了 Phase 1 的发现职责。因为 FLE 会选举拥有最新提议历史的节点作为 leader，这样就省去了发现最新提议的步骤。实际的实现将 Phase 1 和 Phase 2 合并为 Recovery Phase（恢复阶段）。所以，ZAB 的实现只有三个阶段：<br>  ● Fast Leader Election<br>  ● Recovery Phase<br>  ● Broadcast Phase</p>
+<h1 id="成为-leader-的条件"><a href="#成为-leader-的条件" class="headerlink" title="成为 leader 的条件"></a>成为 leader 的条件</h1><p>1、选epoch最大的<br>2、epoch相等，选 zxid 最大的<br>3、epoch和zxid都相等，选择server id最大的（就是我们配置zoo.cfg中的myid）<br>    节点在选举开始都默认投票给自己，当接收其他节点的选票时，会根据上面的条件更改自己的选票并重新发送选票给其他节点，当有一个节点的得票超过半数，该节点会设置自己的状态为 leading，其他节点会设置自己的状态为 following</p>
+<p>  ● 主从架构下，leader 崩溃，数据一致性怎么保证？leader 崩溃之后，集群会选出新的 leader，然后就会进入恢复阶段，新的 leader 具有所有已经提交的提议，因此它会保证让 followers 同步已提交的提议，丢弃未提交的提议（以 leader 的记录为准），这就保证了整个集群的数据一致性。<br>  ● 选举 leader 的时候，整个集群无法处理写请求的，如何快速进行 leader 选举？这是通过 Fast Leader Election 实现的，leader 的选举只需要超过半数的节点投票即可，这样不需要等待所有节点的选票，能够尽早选出 leader。</p>
+<h1 id="服务器启动时期的Leader选举"><a href="#服务器启动时期的Leader选举" class="headerlink" title="服务器启动时期的Leader选举"></a>服务器启动时期的Leader选举</h1><p>1、每个server会发出一个投票<br>2、接收来自各个服务器的投票<br>3、处理投票 优先检查ZXID，比较大的优先Leader，如果相同，比较myid，大的作为Leader<br>4、统计投票<br>5、改变服务器状态 leading following</p>
+<h1 id="FastLeaderElection-投票算法流程"><a href="#FastLeaderElection-投票算法流程" class="headerlink" title="FastLeaderElection 投票算法流程"></a>FastLeaderElection 投票算法流程</h1><p>QuorumCnxManager负责各台服务器之间的底层Leader选举过程中的网络通信</p>
+<h2 id="投票数据结构-Vote"><a href="#投票数据结构-Vote" class="headerlink" title="投票数据结构 Vote"></a>投票数据结构 Vote</h2><p>sid zxid electionEpoch peerEpoch </p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>1、logicalclock属性，标识当前Leader的选举轮次<br>2、初始化选票，对vote属性的初始化<br>3、发送初始化选票，放入到sendqueue队列中，由发送器WorkerSender负责发送出去<br>4、每台服务器WorkerReceiver都会不断地从recvqueue队列中获取外部投票<br>5、判断选举轮次logicalclock<br>6、选票PK 比较ZXID 相等的话比较SID<br>7、变更投票 如果外部投票优于内部投票，那么将变更后的内部投票发送出去<br>8、选票归档<br>9、统计投票 如果以及有过半的服务器认可了当前的内部投票，则终止投票，然后更新自己是leading following还是observing</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/zookeeper/" rel="tag"># zookeeper</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/26/rediscluster/" rel="next" title="Redis 集群 Cluster Master Slave">
+                <i class="fa fa-chevron-left"></i> Redis 集群 Cluster Master Slave
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/02/session/" rel="prev" title="Session会话">
+                Session会话 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ZAB协议-Zookeeper-Atomic-Broadcast"><span class="nav-number">1.</span> <span class="nav-text">ZAB协议 Zookeeper Atomic Broadcast</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ZAB协议三种角色"><span class="nav-number">2.</span> <span class="nav-text">ZAB协议三种角色</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Leader"><span class="nav-number">2.1.</span> <span class="nav-text">Leader</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Follower"><span class="nav-number">2.2.</span> <span class="nav-text">Follower</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Observer"><span class="nav-number">2.3.</span> <span class="nav-text">Observer</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ZAB-中的节点有四种状态"><span class="nav-number">3.</span> <span class="nav-text">ZAB 中的节点有四种状态</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Leading"><span class="nav-number">3.1.</span> <span class="nav-text">Leading</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Following"><span class="nav-number">3.2.</span> <span class="nav-text">Following</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Looking"><span class="nav-number">3.3.</span> <span class="nav-text">Looking</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Observing"><span class="nav-number">3.4.</span> <span class="nav-text">Observing</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Zxid-和-Quorum介绍"><span class="nav-number">4.</span> <span class="nav-text">Zxid 和 Quorum介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#quorum"><span class="nav-number">4.1.</span> <span class="nav-text">quorum</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ZAB协议实现-Fast-Leader-Election"><span class="nav-number">5.</span> <span class="nav-text">ZAB协议实现 Fast Leader Election</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Phase-0-Leader-election-选举阶段）"><span class="nav-number">5.1.</span> <span class="nav-text">Phase 0: Leader election (选举阶段）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Phase-1-Discovery-发现阶fS"><span class="nav-number">5.2.</span> <span class="nav-text">Phase 1: Discovery (发现阶fS )</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Phase-2-Synchronization-同步阶段）"><span class="nav-number">5.3.</span> <span class="nav-text">Phase 2: Synchronization (同步阶段）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Phase-3-Broadcast-广播阶段）"><span class="nav-number">5.4.</span> <span class="nav-text">Phase 3: Broadcast (广播阶段）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#成为-leader-的条件"><span class="nav-number">6.</span> <span class="nav-text">成为 leader 的条件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务器启动时期的Leader选举"><span class="nav-number">7.</span> <span class="nav-text">服务器启动时期的Leader选举</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#FastLeaderElection-投票算法流程"><span class="nav-number">8.</span> <span class="nav-text">FastLeaderElection 投票算法流程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#投票数据结构-Vote"><span class="nav-number">8.1.</span> <span class="nav-text">投票数据结构 Vote</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流程"><span class="nav-number">8.2.</span> <span class="nav-text">流程</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
