@@ -272,7 +272,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/15/conc/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/21/consisthash.md/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -291,7 +291,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/15/conc/" itemprop="url">ConcurrentHashMap</a></h1>
+                <a class="post-title-link" href="/2017/02/21/consisthash.md/" itemprop="url">一致性hash算法</a></h1>
         
 
         <div class="post-meta">
@@ -303,8 +303,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-15T12:19:00+08:00">
-                2017-01-15
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-21T22:14:00+08:00">
+                2017-02-21
               </time>
             
 
@@ -326,8 +326,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/集合/" itemprop="url" rel="index">
-                    <span itemprop="name">集合</span>
+                  <a href="/categories/基础知识/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
                   </a>
                 </span>
 
@@ -364,10 +364,10 @@
 
       
         
-          <h1 id="Hashtable-和-ConcurrentHashMap比较："><a href="#Hashtable-和-ConcurrentHashMap比较：" class="headerlink" title="Hashtable 和 ConcurrentHashMap比较："></a>Hashtable 和 ConcurrentHashMap比较：</h1><h2 id="相同点："><a href="#相同点：" class="headerlink" title="相同点："></a>相同点：</h2><p>Hashtable 和 ConcurrentHashMap都是线程安全的，可以在多线程环境中运行； key跟value都不能是null。它们都可以用于多线程的环境。<br>
+          <h1 id="hash机器节点"><a href="#hash机器节点" class="headerlink" title="hash机器节点"></a>hash机器节点</h1><p>首先求出机器节点的hash值，然后将其分布到0～2^32的一个圆环上（顺时针分布）。如下图所示：<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/15/conc/#more" rel="contents">
+            <a class="btn" href="/2017/02/21/consisthash.md/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -418,7 +418,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/13/loader/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/18/redisandmem/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -437,7 +437,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/13/loader/" itemprop="url">类加载机制</a></h1>
+                <a class="post-title-link" href="/2017/02/18/redisandmem/" itemprop="url">Memcached和Redis的区别</a></h1>
         
 
         <div class="post-meta">
@@ -449,8 +449,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-13T10:16:55+08:00">
-                2017-01-13
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-18T12:31:00+08:00">
+                2017-02-18
               </time>
             
 
@@ -472,8 +472,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/基础知识/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
                   </a>
                 </span>
 
@@ -510,10 +510,10 @@
 
       
         
-          <h1 id="类加载生命周期"><a href="#类加载生命周期" class="headerlink" title="类加载生命周期"></a>类加载生命周期</h1><p>Java源代码被编译成class字节码，最终需要加载到虚拟机中才能运行。程序执行之前，会进行类的加载、连接与初始化<br><img src="/images/loader/1.jpg" alt=""><br>1.加载<br>　　查找并加载类的二进制数据。　<br>
+          <h1 id="Memcached和Redis的区别"><a href="#Memcached和Redis的区别" class="headerlink" title="Memcached和Redis的区别"></a>Memcached和Redis的区别</h1><p>1、数据类型不同，memcached只支持key-value，redis支持String，List，Hash，set，sorted Set<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/13/loader/#more" rel="contents">
+            <a class="btn" href="/2017/02/18/redisandmem/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -564,7 +564,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/11/gc/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/17/singleton/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -583,7 +583,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/11/gc/" itemprop="url">垃圾回收算法、垃圾收集器 G1</a></h1>
+                <a class="post-title-link" href="/2017/02/17/singleton/" itemprop="url">单例模式</a></h1>
         
 
         <div class="post-meta">
@@ -595,8 +595,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-11T08:17:14+08:00">
-                2017-01-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-17T19:25:22+08:00">
+                2017-02-17
               </time>
             
 
@@ -618,8 +618,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/基础知识/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
                   </a>
                 </span>
 
@@ -656,11 +656,10 @@
 
       
         
-          <h1 id="疑问：为什么要分代？"><a href="#疑问：为什么要分代？" class="headerlink" title="疑问：为什么要分代？"></a>疑问：为什么要分代？</h1><p>分代的垃圾回收策略，是基于这样一个事实：不同的对象的生命周期是不一样的。因此，不同生命周期的对象可以采取不同的收集方式，以便提高回收效率。</p>
-<h1 id="如何判断对象是否存活"><a href="#如何判断对象是否存活" class="headerlink" title="如何判断对象是否存活"></a>如何判断对象是否存活</h1><p>GC动作发生之前，需要确定堆内存中哪些对象是存活的，一般有两种方法：引用计数法和可达性分析法。<br>
+          <h1 id="饿汉模式"><a href="#饿汉模式" class="headerlink" title="饿汉模式"></a>饿汉模式</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> instance;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/11/gc/#more" rel="contents">
+            <a class="btn" href="/2017/02/17/singleton/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -711,7 +710,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/09/monitor/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/13/transaction/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -730,7 +729,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/09/monitor/" itemprop="url">性能监控和故障处理</a></h1>
+                <a class="post-title-link" href="/2017/02/13/transaction/" itemprop="url">事务</a></h1>
         
 
         <div class="post-meta">
@@ -742,8 +741,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-09T10:33:14+08:00">
-                2017-01-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-13T17:28:28+08:00">
+                2017-02-13
               </time>
             
 
@@ -765,8 +764,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/基础知识/" itemprop="url" rel="index">
+                    <span itemprop="name">基础知识</span>
                   </a>
                 </span>
 
@@ -803,11 +802,10 @@
 
       
         
-          <h1 id="GC日志出现的关键字"><a href="#GC日志出现的关键字" class="headerlink" title="GC日志出现的关键字"></a>GC日志出现的关键字</h1><h2 id="Allocation-Failure"><a href="#Allocation-Failure" class="headerlink" title="Allocation Failure"></a>Allocation Failure</h2><p>大部分GC，尤其是YGC，都是因为分配内存失败才触发的</p>
-<h2 id="Prommotion-failed"><a href="#Prommotion-failed" class="headerlink" title="Prommotion failed"></a>Prommotion failed</h2><p>由于救助空间不够，从而向年老代转移对象，年老代没有足够的空间来容纳这些对象，导致一次full gc的产生<br>
+          <h1 id="分布式遇到的问题："><a href="#分布式遇到的问题：" class="headerlink" title="分布式遇到的问题："></a>分布式遇到的问题：</h1><p>1、通信异常<br>2、网络分区（脑裂）<br>3、三态（成功、失败<br>4、节点故障<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/09/monitor/#more" rel="contents">
+            <a class="btn" href="/2017/02/13/transaction/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -858,7 +856,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/07/ref/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/12/Semaphore/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -877,7 +875,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/07/ref/" itemprop="url">四种引用 强 软 弱 虚</a></h1>
+                <a class="post-title-link" href="/2017/02/12/Semaphore/" itemprop="url">Semaphore</a></h1>
         
 
         <div class="post-meta">
@@ -889,8 +887,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-07T12:25:32+08:00">
-                2017-01-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-12T14:11:56+08:00">
+                2017-02-12
               </time>
             
 
@@ -912,8 +910,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
                   </a>
                 </span>
 
@@ -950,11 +948,10 @@
 
       
         
-          <h1 id="强引用"><a href="#强引用" class="headerlink" title="强引用"></a>强引用</h1><p>就是指在程序代码之中普遍存在的，类似”Object obj = new Object()”这类的引用，只要强引用还存在，垃圾收集器永远不会回收掉被引用的对象</p>
-<h1 id="软引用"><a href="#软引用" class="headerlink" title="软引用"></a>软引用</h1><p>是用来描述一些还有用但并非必需的对象，对于软引用关联着的对象，在系统将要发生内存溢出异常之前，将会把这些对象列进回收范围进行第二次回收。如果这次回收还没有足够的内存，才会抛出内存溢出异常。在JDK1.2之后，提供了SoftReference类来实现软引用<br>
+          <h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><p>Semaphore可以用来做流量分流，特别是对公共资源有限的场景，比如数据库连接。<br>假设有这个的需求，读取几万个文件的数据到数据库中，由于文件读取是IO密集型任务，可以启动几十个线程并发读取，但是数据库连接数只有10个，这时就必须控制最多只有10个线程能够拿到数据库连接进行操作。这个时候，就可以使用Semaphore做流量控制<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/07/ref/#more" rel="contents">
+            <a class="btn" href="/2017/02/12/Semaphore/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1005,7 +1002,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/05/memory/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/11/ReentrantLock/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1024,7 +1021,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/05/memory/" itemprop="url">内存溢出与内存泄露</a></h1>
+                <a class="post-title-link" href="/2017/02/11/ReentrantLock/" itemprop="url">ReentrantLock</a></h1>
         
 
         <div class="post-meta">
@@ -1036,8 +1033,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-05T15:42:10+08:00">
-                2017-01-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-11T15:14:24+08:00">
+                2017-02-11
               </time>
             
 
@@ -1059,8 +1056,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
                   </a>
                 </span>
 
@@ -1097,11 +1094,10 @@
 
       
         
-          <h1 id="内存溢出-out-of-memory"><a href="#内存溢出-out-of-memory" class="headerlink" title="内存溢出 out of memory"></a>内存溢出 out of memory</h1><p>程序在申请内存时，没有足够的内存空间供其使用，出现out of memory；比如申请了一个integer,但给它存了long才能存下的数，那就是内存溢出。</p>
-<h2 id="虚拟机栈和本地方法栈溢出"><a href="#虚拟机栈和本地方法栈溢出" class="headerlink" title="虚拟机栈和本地方法栈溢出"></a>虚拟机栈和本地方法栈溢出</h2><p>StackOverflowError线程请求的栈深度大于虚拟机所允许的最大深度(循环递归） • OutOfMemoryError:虚拟机在扩展栈是无法申请到足够的内存空间，一般可以通过不停地 创建线程引起此种情况<br>
+          <h1 id="继承关系"><a href="#继承关系" class="headerlink" title="继承关系"></a>继承关系</h1><p>abstract static class Sync extends AbstractQueuedSynchronizer<br>Sync继承 AQS（AbstractQueuedSynchronizer）<br>FairSync（公平锁）、NonfairySync（非公平锁）是Sync的子类。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/05/memory/#more" rel="contents">
+            <a class="btn" href="/2017/02/11/ReentrantLock/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1152,7 +1148,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/01/03/jvm/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/10/AQS/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1171,7 +1167,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/01/03/jvm/" itemprop="url">JVM体系结构</a></h1>
+                <a class="post-title-link" href="/2017/02/10/AQS/" itemprop="url">AQS</a></h1>
         
 
         <div class="post-meta">
@@ -1183,8 +1179,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-01-03T16:31:32+08:00">
-                2017-01-03
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-10T07:54:00+08:00">
+                2017-02-10
               </time>
             
 
@@ -1206,8 +1202,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/JVM/" itemprop="url" rel="index">
-                    <span itemprop="name">JVM</span>
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
                   </a>
                 </span>
 
@@ -1244,10 +1240,448 @@
 
       
         
-          <h1 id="体系结构"><a href="#体系结构" class="headerlink" title="体系结构"></a>体系结构</h1><h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><p>严格来说是一个数据结构，用于保存当前正在执行的程序的内存地址，由于Java是支持多线程执行的，所以程序执行的轨迹不可能一直都是线性执行。当有多个线程交叉执行时，被中断的线程的程序当前执行到哪条内存地址必然要保存下来，以便用于被中断的线程恢复执行时再按照被中断时的指令地址继续执行下去。 为了线程切换后能恢复到正确的执行位置，每个线程都需要有一个独立的程序计数器，各个线程之间计数器互不影响，独立存储，我们称这类内存区域为“线程私有”的内存<br>
+          <h1 id="Unsafe类"><a href="#Unsafe类" class="headerlink" title="Unsafe类"></a>Unsafe类</h1><p>Java最初被设计为一种安全的受控环境。尽管如此，HotSpot还是包含了一个后门sun.misc.Unsafe，提供了一些可以直接操控内存和线程的底层操作。<br>一些有用的方法<br>  1.objectFieldOffset：能够获取到指定实例变量的在对象内存中的偏移量<br>long offset = UNSAFE.objectFieldOffset(UnsafeTest.class.getDeclaredField(“state”));<br>  2.compareAndSwapInt：通过比较并替换的机制，修改指定偏移量内存的值<br>UNSAFE.compareAndSwapInt(unsafeTest, offset, 0, 1)<br>  3.park：挂起某一线程<br>  4.unpark：唤醒某一线程<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/01/03/jvm/#more" rel="contents">
+            <a class="btn" href="/2017/02/10/AQS/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/09/CyclicBarrier/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/09/CyclicBarrier/" itemprop="url">CyclicBarrier</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-09T14:38:22+08:00">
+                2017-02-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="Lock"><a href="#Lock" class="headerlink" title="Lock"></a>Lock</h1><p>Lock和synchronized是对应的，Condition和Object的监控方法（wait、notify）是对应的<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/09/CyclicBarrier/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/08/ThreadPoolExecutor/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/08/ThreadPoolExecutor/" itemprop="url">ThreadPoolExecutor</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-08T19:11:50+08:00">
+                2017-02-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="为什么要用线程池"><a href="#为什么要用线程池" class="headerlink" title="为什么要用线程池"></a>为什么要用线程池</h1><p>1.降低资源消耗。<br>2.提高响应速度。<br>3.提高线程的可管理性。<br>3.减少了创建和销毁线程的次数，每个工作线程都可以被重复利用，可执行多个任务。<br>4.可以根据系统的承受能力，调整线程池中工作线线程的数目，防止因为消耗过多的内存，而把服务器累趴下<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/08/ThreadPoolExecutor/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/07/volatile/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2017/02/07/volatile/" itemprop="url">volatile</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-07T18:14:55+08:00">
+                2017-02-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/多线程/" itemprop="url" rel="index">
+                    <span itemprop="name">多线程</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <h1 id="Happens-Before原则"><a href="#Happens-Before原则" class="headerlink" title="Happens-Before原则"></a>Happens-Before原则</h1><p>下面就来具体介绍下（先行发生原则）：<br>  ● 程序次序规则：一个线程内，按照代码顺序，书写在前面的操作先行发生于书写在后面的操作<br>  ● 锁定规则：一个unLock操作先行发生于后面对同一个锁的lock操作<br>  ● volatile变量规则：对一个变量的写操作先行发生于后面对这个变量的读操作<br>  ● 传递规则：如果操作A先行发生于操作B，而操作B又先行发生于操作C，则可以得出操作A先行发生于操作C<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2017/02/07/volatile/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1289,7 +1723,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span>
+    <a class="extend prev" rel="prev" href="/page/3/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><span class="page-number current">4</span><a class="page-number" href="/page/5/">5</a><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/5/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1339,7 +1773,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">59</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1350,7 +1784,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1361,7 +1795,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>

@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="二叉搜索树3个特点：1.所有非叶子结点至多拥有两个儿子（Left和Right）；       2.所有结点存储一个关键字；       3.非叶子结点的左指针指向小于其关键字的子树，右指针指向大于其关键字的子树；">
+<meta name="keywords" content="算法">
+<meta property="og:type" content="website">
+<meta property="og:title" content="二叉树 B树 B+树 B*树">
+<meta property="og:url" content="http://yoursite.com/2017-03-19-.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="二叉搜索树3个特点：1.所有非叶子结点至多拥有两个儿子（Left和Right）；       2.所有结点存储一个关键字；       3.非叶子结点的左指针指向小于其关键字的子树，右指针指向大于其关键字的子树；">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-28.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-29.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-30.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-31.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-32.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-33.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-34.png">
+<meta property="og:updated_time" content="2018-02-20T11:12:23.450Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="二叉树 B树 B+树 B*树">
+<meta name="twitter:description" content="二叉搜索树3个特点：1.所有非叶子结点至多拥有两个儿子（Left和Right）；       2.所有结点存储一个关键字；       3.非叶子结点的左指针指向小于其关键字的子树，右指针指向大于其关键字的子树；">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-28.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017-03-19-.html"/>
+
+
+
+
+
+  <title>二叉树 B树 B+树 B*树 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-search">
+          <a href="/search" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-search"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+    
+    
+    <div class="post-block page">
+      <header class="post-header">
+
+	<h1 class="post-title" itemprop="name headline">二叉树 B树 B+树 B*树</h1>
+
+
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+        
+        
+          <h1 id="二叉搜索树"><a href="#二叉搜索树" class="headerlink" title="二叉搜索树"></a>二叉搜索树</h1><h2 id="3个特点："><a href="#3个特点：" class="headerlink" title="3个特点："></a>3个特点：</h2><p>1.所有非叶子结点至多拥有两个儿子（Left和Right）；<br>       2.所有结点存储一个关键字；<br>       3.非叶子结点的左指针指向小于其关键字的子树，右指针指向大于其关键字的子树；<br><a id="more"></a></p>
+<p><img src="/images/pasted-28.png" alt="upload successful"><br>B树的搜索，从根结点开始，如果查询的关键字与结点的关键字相等，那么就命中；<br>否则，如果查询关键字比结点关键字小，就进入左儿子；如果比结点关键字大，就进入<br>右儿子；如果左儿子或右儿子的指针为空，则报告找不到相应的关键字；<br>       如果B树的所有非叶子结点的左右子树的结点数目均保持差不多（平衡），那么B树<br>的搜索性能逼近二分查找；但它比连续内存空间的二分查找的优点是，改变B树结构<br>（插入与删除结点）不需要移动大段的内存数据，甚至通常是常数开销；<br>       如：</p>
+<p><img src="/images/pasted-29.png" alt="upload successful"></p>
+<p>   但B树在经过多次插入与删除后，有可能导致不同的结构：</p>
+<p><img src="/images/pasted-30.png" alt="upload successful"><br>右边也是一个B树，但它的搜索性能已经是线性的了；同样的关键字集合有可能导致不同的<br>树结构索引；所以，使用B树还要考虑尽可能让B树保持左图的结构，和避免右图的结构，也就<br>是所谓的“平衡”问题；<br>       实际使用的B树都是在原B树的基础上加上平衡算法，即“平衡# 二叉树”；如何保持B树<br>结点分布均匀的平衡算法是平衡二叉树的关键；平衡算法是一种在B树中插入和删除结点的<br>策略。</p>
+<h1 id="二、B树"><a href="#二、B树" class="headerlink" title="二、B树"></a>二、B树</h1><h2 id="3个特点：-1"><a href="#3个特点：-1" class="headerlink" title="3个特点："></a>3个特点：</h2><p>1.关键字集合分布在整颗树中；<br>2.任何一个关键字出现且只出现在一个结点中；<br>3.搜索有可能在非叶子结点结束；<br>4.其搜索性能等价于在关键字全集内做一次二分查找；<br>5.自动层次控制；</p>
+<p>是一种多路搜索树（并不是二叉的）：<br>       1.定义任意非叶子结点最多只有M个儿子；且M&gt;2；<br>       2.根结点的儿子数为[2, M]；<br>       3.除根结点以外的非叶子结点的儿子数为[M/2, M]；<br>       4.每个结点存放至少M/2-1（取上整）和至多M-1个关键字；（至少2个关键字）<br>       5.非叶子结点的关键字个数=指向儿子的指针个数-1；<br>       6.非叶子结点的关键字：K[1], K[2], …, K[M-1]；且K[i] &lt; K[i+1]；<br>       7.非叶子结点的指针：P[1], P[2], …, P[M]；其中P[1]指向关键字小于K[1]的<br>子树，P[M]指向关键字大于K[M-1]的子树，其它P[i]指向关键字属于(K[i-1], K[i])的子树；<br>       8.所有叶子结点位于同一层；<br>       如：（M=3）</p>
+<p><img src="/images/pasted-31.png" alt="upload successful"> B-树的搜索，从根结点开始，对结点内的关键字（有序）序列进行二分查找，如果<br>命中则结束，否则进入查询关键字所属范围的儿子结点；重复，直到所对应的儿子指针为<br>空，或已经是叶子结点；</p>
+<p>   由于限制了除根结点以外的非叶子结点，至少含有M/2个儿子，确保了结点的至少<br>利用率，其最底搜索性能为：</p>
+<p><img src="/images/pasted-32.png" alt="upload successful"></p>
+<p>   其中，M为设定的非叶子结点最多子树个数，N为关键字总数；<br>  所以B-树的性能总是等价于二分查找（与M值无关），也就没有B树平衡的问题；<br>  由于M/2的限制，在插入结点时，如果结点已满，需要将结点分裂为两个各占<br>M/2的结点；删除结点时，需将两个不足M/2的兄弟结点合并；</p>
+<h1 id="B-树"><a href="#B-树" class="headerlink" title="B+树"></a>B+树</h1><h2 id="3个特点：-2"><a href="#3个特点：-2" class="headerlink" title="3个特点："></a>3个特点：</h2><p>1、B+树中间节点没有卫星数据，所以同样大小的磁盘页可以容纳更多的节点元素，也就是说B+树比B树更加矮胖，所以查询IO次数更少。单一节点存储更多的元素，使得查询的IO次数更少。<br>2、B+树必须最终查找到叶子节点才行，B树只要找到匹配元素即可，无论是在中间节点还是在叶子节点。所以B树查找性能不稳定，B+树查找性能稳定,所有查询都要查找到叶子节点，查询性能稳定。<br>3、B树需要繁琐的中序遍历，B+树的范围查询更加方便，只需要在链表上遍历即可,所有叶子节点形成有序链表，便于范围查询。更适合文件索引系统。<br>4、所有关键字都出现在叶子结点的链表中（稠密索引），且链表中的关键字恰好<br>是有序的，不可能在非叶子结点命中，非叶子结点相当于是叶子结点的索引（稀疏索引），叶子结点相当于是存储（关键字）数据的数据层；</p>
+<p>聚集索引（Clustered Index）中，叶子节点直接包含卫星数据。<br>非聚集索引（NonClustered Index）中，叶子节点带有指向卫星数据的指针。<br>       B+树是B-树的变体，也是一种多路搜索树：<br>       1.其定义基本与B-树同，除了：<br>       2.非叶子结点的子树指针与关键字个数相同；<br>       3.非叶子结点的子树指针P[i]，指向关键字值属于[K[i], K[i+1])的子树<br>（B-树是开区间）；<br>       5.为所有叶子结点增加一个链指针；<br>       6.所有关键字都在叶子结点出现；<br>       如：（M=3）</p>
+<p><img src="/images/pasted-33.png" alt="upload successful"> B+的搜索与B-树也基本相同，区别是B+树只有达到叶子结点才命中（B-树可以在<br>非叶子结点命中），其性能也等价于在关键字全集做一次二分查找；</p>
+<h1 id="B-树-1"><a href="#B-树-1" class="headerlink" title="B*树"></a>B*树</h1><p>  是B+树的变体，在B+树的非根和非叶子结点再增加指向兄弟的指针；</p>
+<p><img src="/images/pasted-34.png" alt="upload successful"><br>B<em>树定义了非叶子结点关键字个数至少为(2/3)</em>M，即块的最低使用率为2/3<br>（代替B+树的1/2）；<br>       B+树的分裂：当一个结点满时，分配一个新的结点，并将原结点中1/2的数据<br>复制到新结点，最后在父结点中增加新结点的指针；B+树的分裂只影响原结点和父<br>结点，而不会影响兄弟结点，所以它不需要指向兄弟的指针；<br>       B<em>树的分裂：当一个结点满时，如果它的下一个兄弟结点未满，那么将一部分<br>数据移到兄弟结点中，再在原结点插入关键字，最后修改父结点中兄弟结点的关键字<br>（因为兄弟结点的关键字范围改变了）；如果兄弟也满了，则在原结点与兄弟结点之<br>间增加新结点，并各复制1/3的数据到新结点，最后在父结点增加新结点的指针；<br>       所以，B</em>树分配新结点的概率比B+树要低，空间使用率更高；</p>
+
+        
+      </div>
+      
+      
+      
+    </div>
+    
+    
+    
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">59</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">6</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">18</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#二叉搜索树"><span class="nav-number">1.</span> <span class="nav-text">二叉搜索树</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3个特点："><span class="nav-number">1.1.</span> <span class="nav-text">3个特点：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、B树"><span class="nav-number">2.</span> <span class="nav-text">二、B树</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3个特点：-1"><span class="nav-number">2.1.</span> <span class="nav-text">3个特点：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#B-树"><span class="nav-number">3.</span> <span class="nav-text">B+树</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3个特点：-2"><span class="nav-number">3.1.</span> <span class="nav-text">3个特点：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#B-树-1"><span class="nav-number">4.</span> <span class="nav-text">B*树</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

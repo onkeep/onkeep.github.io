@@ -272,7 +272,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/17/singleton/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/17/redblack/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -291,7 +291,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/17/singleton/" itemprop="url">单例模式</a></h1>
+                <a class="post-title-link" href="/2017/03/17/redblack/" itemprop="url">红黑树</a></h1>
         
 
         <div class="post-meta">
@@ -303,8 +303,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-17T19:25:22+08:00">
-                2017-02-17
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-17T16:43:00+08:00">
+                2017-03-17
               </time>
             
 
@@ -326,8 +326,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/基础知识/" itemprop="url" rel="index">
-                    <span itemprop="name">基础知识</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -364,10 +364,10 @@
 
       
         
-          <h1 id="饿汉模式"><a href="#饿汉模式" class="headerlink" title="饿汉模式"></a>饿汉模式</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Singleton</span> </span>&#123;  </span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span> <span class="params">()</span></span>&#123;&#125;  </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Singleton <span class="title">getInstance</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">        <span class="keyword">return</span> instance;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <h1 id="红黑树的特性"><a href="#红黑树的特性" class="headerlink" title="红黑树的特性"></a>红黑树的特性</h1><p>大致有三个（换句话说，插入、删除节点后整个红黑树也必须满足下面的三个性质，如果不满足则必须进行旋转）：<br>1、根节点与叶节点都是黑色节点，其中叶节点为Null节点<br>2、每个红色节点的两个子节点都是黑色节点，换句话说就是不能有连续两个红色节点<br>3、从根节点到所有叶子节点上的黑色节点数量是相同的<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/17/singleton/#more" rel="contents">
+            <a class="btn" href="/2017/03/17/redblack/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -418,7 +418,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/13/transaction/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/16/arrange/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -437,7 +437,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/13/transaction/" itemprop="url">事务</a></h1>
+                <a class="post-title-link" href="/2017/03/16/arrange/" itemprop="url">动态规划</a></h1>
         
 
         <div class="post-meta">
@@ -449,8 +449,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-13T17:28:28+08:00">
-                2017-02-13
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-16T10:16:00+08:00">
+                2017-03-16
               </time>
             
 
@@ -472,8 +472,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/基础知识/" itemprop="url" rel="index">
-                    <span itemprop="name">基础知识</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -510,10 +510,10 @@
 
       
         
-          <h1 id="分布式遇到的问题："><a href="#分布式遇到的问题：" class="headerlink" title="分布式遇到的问题："></a>分布式遇到的问题：</h1><p>1、通信异常<br>2、网络分区（脑裂）<br>3、三态（成功、失败<br>4、节点故障<br>
+          <p>一、最长公共子序列（longest common sequence）<br>即一个给定的序列的子序列，就是将给定序列中零个或多个元素去掉之后得到的结果。<br>给定的字符序列： {a,b,c,d,e,f,g,h}，它的子序列示例： {a,c,e,f} 即元素b,d,g,h被去掉后，保持原有的元素序列所得到的结果就是子序列。同理，{a,h},{c,d,e}等都是它的子序列。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/13/transaction/#more" rel="contents">
+            <a class="btn" href="/2017/03/16/arrange/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -564,7 +564,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/12/Semaphore/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/15/top/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -583,7 +583,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/12/Semaphore/" itemprop="url">Semaphore</a></h1>
+                <a class="post-title-link" href="/2017/03/15/top/" itemprop="url">top问题</a></h1>
         
 
         <div class="post-meta">
@@ -595,8 +595,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-12T14:11:56+08:00">
-                2017-02-12
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-15T11:27:00+08:00">
+                2017-03-15
               </time>
             
 
@@ -618,8 +618,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -656,10 +656,11 @@
 
       
         
-          <h1 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h1><p>Semaphore可以用来做流量分流，特别是对公共资源有限的场景，比如数据库连接。<br>假设有这个的需求，读取几万个文件的数据到数据库中，由于文件读取是IO密集型任务，可以启动几十个线程并发读取，但是数据库连接数只有10个，这时就必须控制最多只有10个线程能够拿到数据库连接进行操作。这个时候，就可以使用Semaphore做流量控制<br>
+          <p><a href="http://blog.csdn.net/v_july_v/article/details/7382693" target="_blank" rel="noopener">http://blog.csdn.net/v_july_v/article/details/7382693</a><br>top问题</p>
+<p>1、hash去重<br>2、排序最小堆<br>3、分而治之<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/12/Semaphore/#more" rel="contents">
+            <a class="btn" href="/2017/03/15/top/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -710,7 +711,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/11/ReentrantLock/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/14/exchange/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -729,7 +730,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/11/ReentrantLock/" itemprop="url">ReentrantLock</a></h1>
+                <a class="post-title-link" href="/2017/03/14/exchange/" itemprop="url">冒泡排序与快速排序</a></h1>
         
 
         <div class="post-meta">
@@ -741,8 +742,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-11T15:14:24+08:00">
-                2017-02-11
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-14T17:22:00+08:00">
+                2017-03-14
               </time>
             
 
@@ -764,8 +765,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -802,10 +803,10 @@
 
       
         
-          <h1 id="继承关系"><a href="#继承关系" class="headerlink" title="继承关系"></a>继承关系</h1><p>abstract static class Sync extends AbstractQueuedSynchronizer<br>Sync继承 AQS（AbstractQueuedSynchronizer）<br>FairSync（公平锁）、NonfairySync（非公平锁）是Sync的子类。<br>
+          <h1 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h1><p>1.比较a[0]和a[1]，如果a[0]&gt;a[1]，则交换a[0]，a[1]，然后比较新的a[1]（可能是原来的a[0]）和a[2]，如果a[1]&gt;a[2]，则交换　　　　a[1]，a[2]，以此类推，直到a[n-2]和a[n-1]比较完毕，这样，a中的最大数就“沉底”了，即a[n-1]是数组a中的最大值。<br>　　2.从头开始继续第1步的操作，所不同的是本次比较到a[n-2]即可结束，这样数组a中的次大值就被交换到a[n-2]的位置。<br>　　3.以此比较n-1次，数组a就按照从小到大的顺序排好了。（也可以判断是否有交换发生，如果一趟比较没有发生交换，则表示数组a已经排好序）。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/11/ReentrantLock/#more" rel="contents">
+            <a class="btn" href="/2017/03/14/exchange/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -856,7 +857,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/10/AQS/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/13/jiaoji/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -875,7 +876,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/10/AQS/" itemprop="url">AQS</a></h1>
+                <a class="post-title-link" href="/2017/03/13/jiaoji/" itemprop="url">求两个集合交集的方法</a></h1>
         
 
         <div class="post-meta">
@@ -887,8 +888,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-10T07:54:00+08:00">
-                2017-02-10
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-13T22:15:00+08:00">
+                2017-03-13
               </time>
             
 
@@ -910,8 +911,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -948,10 +949,10 @@
 
       
         
-          <h1 id="Unsafe类"><a href="#Unsafe类" class="headerlink" title="Unsafe类"></a>Unsafe类</h1><p>Java最初被设计为一种安全的受控环境。尽管如此，HotSpot还是包含了一个后门sun.misc.Unsafe，提供了一些可以直接操控内存和线程的底层操作。<br>一些有用的方法<br>  1.objectFieldOffset：能够获取到指定实例变量的在对象内存中的偏移量<br>long offset = UNSAFE.objectFieldOffset(UnsafeTest.class.getDeclaredField(“state”));<br>  2.compareAndSwapInt：通过比较并替换的机制，修改指定偏移量内存的值<br>UNSAFE.compareAndSwapInt(unsafeTest, offset, 0, 1)<br>  3.park：挂起某一线程<br>  4.unpark：唤醒某一线程<br>
+          <p>求两个集合交集的方法<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/10/AQS/#more" rel="contents">
+            <a class="btn" href="/2017/03/13/jiaoji/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1002,7 +1003,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/09/CyclicBarrier/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/12/select/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1021,7 +1022,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/09/CyclicBarrier/" itemprop="url">CyclicBarrier</a></h1>
+                <a class="post-title-link" href="/2017/03/12/select/" itemprop="url">选择排序 堆排序</a></h1>
         
 
         <div class="post-meta">
@@ -1033,8 +1034,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-09T14:38:22+08:00">
-                2017-02-09
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-12T12:45:00+08:00">
+                2017-03-12
               </time>
             
 
@@ -1056,8 +1057,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -1094,10 +1095,10 @@
 
       
         
-          <h1 id="Lock"><a href="#Lock" class="headerlink" title="Lock"></a>Lock</h1><p>Lock和synchronized是对应的，Condition和Object的监控方法（wait、notify）是对应的<br>
+          <h1 id="直接选择"><a href="#直接选择" class="headerlink" title="直接选择"></a>直接选择</h1><p>直接选择排序算法的思想比较简单：（假设数据放在一个数组a中，且数组的长度是N）<br>　　1：从a[0]-a[N-1]中选出最小的数据，然后与a[0]交换位置<br>　　2：从a[1]-a[N-1]中选出最小的数据，然后与a[1]交换位置（第1步结束后a[0]就是N个数的最小值）<br>　　3：从a[2]-a[N-1]中选出最小的数据，然后与a[2]交换位置（第2步结束后a[1]就是N-1个数的最小值）<br>　　以此类推，N-1次排序后，待排数据就已经按照从小到大的顺序排列了。<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/09/CyclicBarrier/#more" rel="contents">
+            <a class="btn" href="/2017/03/12/select/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1148,7 +1149,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/08/ThreadPoolExecutor/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/11/insert/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1167,7 +1168,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/08/ThreadPoolExecutor/" itemprop="url">ThreadPoolExecutor</a></h1>
+                <a class="post-title-link" href="/2017/03/11/insert/" itemprop="url">插入排序 希尔排序</a></h1>
         
 
         <div class="post-meta">
@@ -1179,8 +1180,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-08T19:11:50+08:00">
-                2017-02-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-11T23:12:00+08:00">
+                2017-03-11
               </time>
             
 
@@ -1202,8 +1203,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -1240,10 +1241,10 @@
 
       
         
-          <h1 id="为什么要用线程池"><a href="#为什么要用线程池" class="headerlink" title="为什么要用线程池"></a>为什么要用线程池</h1><p>1.降低资源消耗。<br>2.提高响应速度。<br>3.提高线程的可管理性。<br>3.减少了创建和销毁线程的次数，每个工作线程都可以被重复利用，可执行多个任务。<br>4.可以根据系统的承受能力，调整线程池中工作线线程的数目，防止因为消耗过多的内存，而把服务器累趴下<br>
+          <h1 id="直接插入排序"><a href="#直接插入排序" class="headerlink" title="直接插入排序"></a>直接插入排序</h1><p>插入排序是一种通过不断地把新元素插入到已排好序的数据中的排序算法<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/08/ThreadPoolExecutor/#more" rel="contents">
+            <a class="btn" href="/2017/03/11/insert/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1294,7 +1295,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/07/volatile/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/10/binarysearch/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1313,7 +1314,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/07/volatile/" itemprop="url">volatile</a></h1>
+                <a class="post-title-link" href="/2017/03/10/binarysearch/" itemprop="url">二分查找</a></h1>
         
 
         <div class="post-meta">
@@ -1325,8 +1326,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-07T18:14:55+08:00">
-                2017-02-07
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-10T22:35:00+08:00">
+                2017-03-10
               </time>
             
 
@@ -1348,8 +1349,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -1386,10 +1387,10 @@
 
       
         
-          <h1 id="Happens-Before原则"><a href="#Happens-Before原则" class="headerlink" title="Happens-Before原则"></a>Happens-Before原则</h1><p>下面就来具体介绍下（先行发生原则）：<br>  ● 程序次序规则：一个线程内，按照代码顺序，书写在前面的操作先行发生于书写在后面的操作<br>  ● 锁定规则：一个unLock操作先行发生于后面对同一个锁的lock操作<br>  ● volatile变量规则：对一个变量的写操作先行发生于后面对这个变量的读操作<br>  ● 传递规则：如果操作A先行发生于操作B，而操作B又先行发生于操作C，则可以得出操作A先行发生于操作C<br>
+          <p>二分查找<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/07/volatile/#more" rel="contents">
+            <a class="btn" href="/2017/03/10/binarysearch/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1440,7 +1441,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/06/futuretask/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/09/diff/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1459,7 +1460,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/06/futuretask/" itemprop="url">futuretask</a></h1>
+                <a class="post-title-link" href="/2017/03/09/diff/" itemprop="url">链表反序</a></h1>
         
 
         <div class="post-meta">
@@ -1471,8 +1472,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-06T08:24:11+08:00">
-                2017-02-06
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-09T17:23:00+08:00">
+                2017-03-09
               </time>
             
 
@@ -1494,8 +1495,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -1532,10 +1533,10 @@
 
       
         
-          <h1 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h1><p> 就是对于具体的Runnable或者Callable任务的执行结果进行取消、查询是否完成、获取结果。必要时可以通过get方法获取执行结果，该方法会阻塞直到任务返回结果。<br> <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">Future</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">cancel</span><span class="params">(<span class="keyword">boolean</span> mayInterruptIfRunning)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isCancelled</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">boolean</span> <span class="title">isDone</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function">V <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException, ExecutionException</span>;</span><br><span class="line">    <span class="function">V <span class="title">get</span><span class="params">(<span class="keyword">long</span> timeout, TimeUnit unit)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> InterruptedException, ExecutionException, TimeoutException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+          <p>链表反序</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/06/futuretask/#more" rel="contents">
+            <a class="btn" href="/2017/03/09/diff/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1586,7 +1587,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/02/05/ThreadLocal/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/08/44/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Para Li">
@@ -1605,7 +1606,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2017/02/05/ThreadLocal/" itemprop="url">ThreadLocal</a></h1>
+                <a class="post-title-link" href="/2017/03/08/44/" itemprop="url">4x4 对角线输出</a></h1>
         
 
         <div class="post-meta">
@@ -1617,8 +1618,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-02-05T14:18:00+08:00">
-                2017-02-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-08T16:32:00+08:00">
+                2017-03-08
               </time>
             
 
@@ -1640,8 +1641,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/多线程/" itemprop="url" rel="index">
-                    <span itemprop="name">多线程</span>
+                  <a href="/categories/算法/" itemprop="url" rel="index">
+                    <span itemprop="name">算法</span>
                   </a>
                 </span>
 
@@ -1678,10 +1679,10 @@
 
       
         
-          <h1 id="内存泄露"><a href="#内存泄露" class="headerlink" title="内存泄露"></a>内存泄露</h1><p>如果使用ThreadLocal的set方法之后，没有显示的调用remove方法，就有可能发生内存泄露，所以养成良好的编程习惯十分重要，使用完ThreadLocal之后，记得调用remove方法。<br>ThreadLocal可能导致内存泄漏，为什么？<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Entry</span> <span class="keyword">extends</span> <span class="title">WeakReference</span>&lt;<span class="title">ThreadLocal</span>&lt;?&gt;&gt; </span>&#123;</span><br><span class="line">    <span class="comment">/** The value associated with this ThreadLocal. */</span></span><br><span class="line">    Object value;</span><br><span class="line"></span><br><span class="line">    Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">        <span class="keyword">super</span>(k);</span><br><span class="line">        value = v;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+          <p>4x4 对角线输出<br>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2017/02/05/ThreadLocal/#more" rel="contents">
+            <a class="btn" href="/2017/03/08/44/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1723,7 +1724,7 @@
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -1773,7 +1774,7 @@
               
                 <a href="/archives">
               
-                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-count">59</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -1784,7 +1785,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -1795,7 +1796,7 @@
               
               <div class="site-state-item site-state-tags">
                 <a href="/tags/index.html">
-                  <span class="site-state-item-count">17</span>
+                  <span class="site-state-item-count">18</span>
                   <span class="site-state-item-name">标签</span>
                 </a>
               </div>
