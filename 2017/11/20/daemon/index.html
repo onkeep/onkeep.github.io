@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="解析server.xml文件重点关注以http-bio-8080开头的两个守护线程（即http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout），因为这是我们在Tomcat的默认配置下发布web应用时实际处理请求的线程。先看下这两个线程在容器启动时是如何产生和启动的。在前面将Tomcat启动的系列文章中看到Tomcat容器启动时会用Digester读取">
+<meta name="keywords" content="Tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat守护进程启动过程">
+<meta property="og:url" content="http://yoursite.com/2017/11/20/daemon/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="解析server.xml文件重点关注以http-bio-8080开头的两个守护线程（即http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout），因为这是我们在Tomcat的默认配置下发布web应用时实际处理请求的线程。先看下这两个线程在容器启动时是如何产生和启动的。在前面将Tomcat启动的系列文章中看到Tomcat容器启动时会用Digester读取">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-22T15:29:25.500Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tomcat守护进程启动过程">
+<meta name="twitter:description" content="解析server.xml文件重点关注以http-bio-8080开头的两个守护线程（即http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout），因为这是我们在Tomcat的默认配置下发布web应用时实际处理请求的线程。先看下这两个线程在容器启动时是如何产生和启动的。在前面将Tomcat启动的系列文章中看到Tomcat容器启动时会用Digester读取">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/11/20/daemon/"/>
+
+
+
+
+
+  <title>Tomcat守护进程启动过程 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-search">
+          <a href="/search" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-search"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/11/20/daemon/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tomcat守护进程启动过程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-11-20T20:11:00+08:00">
+                2017-11-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">Tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="解析server-xml文件"><a href="#解析server-xml文件" class="headerlink" title="解析server.xml文件"></a>解析server.xml文件</h1><p>重点关注以http-bio-8080开头的两个守护线程（即http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout），因为这是我们在Tomcat的默认配置下发布web应用时实际处理请求的线程。先看下这两个线程在容器启动时是如何产生和启动的。<br>在前面将Tomcat启动的系列文章中看到Tomcat容器启动时会用Digester读取server.xml文件产生相应的组件对象并采取链式调用的方式调用它们的init和start方法，在Digester读取到server.xml中的connector节点时是这么处理的<br><a id="more"></a><br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">digester.addRule(<span class="string">"Server/Service/Connector"</span>,  </span><br><span class="line">                 <span class="keyword">new</span> ConnectorCreateRule());  </span><br><span class="line">digester.addRule(<span class="string">"Server/Service/Connector"</span>,  </span><br><span class="line">                 <span class="keyword">new</span> SetAllPropertiesRule(<span class="keyword">new</span> String[]&#123;<span class="string">"executor"</span>&#125;));  </span><br><span class="line">digester.addSetNext(<span class="string">"Server/Service/Connector"</span>,  </span><br><span class="line">                    <span class="string">"addConnector"</span>,  </span><br><span class="line">                    <span class="string">"org.apache.catalina.connector.Connector"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>以上代码见org.apache.catalina.startup.Catalina类的366到372行。所以在碰到server.xml文件中的Server/Service/Connector节点时将会触发ConnectorCreateRule类的begin方法的调用：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">begin</span><span class="params">(String namespace, String name, Attributes attributes)</span>  </span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> Exception </span>&#123;  </span><br><span class="line">    Service svc = (Service)digester.peek();  </span><br><span class="line">    Executor ex = <span class="keyword">null</span>;  </span><br><span class="line">    <span class="keyword">if</span> ( attributes.getValue(<span class="string">"executor"</span>)!=<span class="keyword">null</span> ) &#123;  </span><br><span class="line">        ex = svc.getExecutor(attributes.getValue(<span class="string">"executor"</span>));  </span><br><span class="line">    &#125;  </span><br><span class="line">    Connector con = <span class="keyword">new</span> Connector(attributes.getValue(<span class="string">"protocol"</span>));  </span><br><span class="line">    <span class="keyword">if</span> ( ex != <span class="keyword">null</span> )  _setExecutor(con,ex);  </span><br><span class="line">      </span><br><span class="line">    digester.push(con);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="Connector构造方法传入protocol"><a href="#Connector构造方法传入protocol" class="headerlink" title="Connector构造方法传入protocol"></a>Connector构造方法传入protocol</h1><p>在第8行，会根据配置文件中Server/Service/Connector节点的protocol属性调用org.apache.catalina.connector.Connector类的构造方法，而默认情况下server.xml文件中Server/Service/Connector节点共有两处配置：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;Connector port=<span class="string">"8080"</span> protocol=<span class="string">"HTTP/1.1"</span>  connectionTimeout=<span class="string">"20000"</span> redirectPort=<span class="string">"8443"</span> /&gt;  </span><br><span class="line"></span><br><span class="line">&lt;Connector port=<span class="string">"8009"</span> protocol=<span class="string">"AJP/1.3"</span> redirectPort=<span class="string">"8443"</span> /&gt;</span><br></pre></td></tr></table></figure></p>
+<p>先看第一个Connector节点，调用Connector的构造方法时会传入字符串HTTP/1.1<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Connector</span><span class="params">(String protocol)</span> </span>&#123;  </span><br><span class="line">    setProtocol(protocol);  </span><br><span class="line">    <span class="comment">// Instantiate protocol handler  </span></span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">        Class&lt;?&gt; clazz = Class.forName(protocolHandlerClassName);  </span><br><span class="line">        <span class="keyword">this</span>.protocolHandler = (ProtocolHandler) clazz.newInstance();  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">        log.error(sm.getString(  </span><br><span class="line">                <span class="string">"coyoteConnector.protocolHandlerInstantiationFailed"</span>), e);  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="setProtocolHandlerClassName"><a href="#setProtocolHandlerClassName" class="headerlink" title="setProtocolHandlerClassName"></a>setProtocolHandlerClassName</h2><p>这里先会执行org.apache.catalina.connector.Connector类的setProtocol方法<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setProtocol</span><span class="params">(String protocol)</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (AprLifecycleListener.isAprAvailable()) &#123;  </span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"HTTP/1.1"</span>.equals(protocol)) &#123;  </span><br><span class="line">            setProtocolHandlerClassName  </span><br><span class="line">                (<span class="string">"org.apache.coyote.http11.Http11AprProtocol"</span>);  </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"AJP/1.3"</span>.equals(protocol)) &#123;  </span><br><span class="line">            setProtocolHandlerClassName  </span><br><span class="line">                (<span class="string">"org.apache.coyote.ajp.AjpAprProtocol"</span>);  </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (protocol != <span class="keyword">null</span>) &#123;  </span><br><span class="line">            setProtocolHandlerClassName(protocol);  </span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;  </span><br><span class="line">            setProtocolHandlerClassName  </span><br><span class="line">                (<span class="string">"org.apache.coyote.http11.Http11AprProtocol"</span>);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;  </span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"HTTP/1.1"</span>.equals(protocol)) &#123;  </span><br><span class="line">            setProtocolHandlerClassName  </span><br><span class="line">                (<span class="string">"org.apache.coyote.http11.Http11Protocol"</span>);  </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (<span class="string">"AJP/1.3"</span>.equals(protocol)) &#123;  </span><br><span class="line">            setProtocolHandlerClassName  </span><br><span class="line">                (<span class="string">"org.apache.coyote.ajp.AjpProtocol"</span>);  </span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (protocol != <span class="keyword">null</span>) &#123;  </span><br><span class="line">            setProtocolHandlerClassName(protocol);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>所以此时会调用setProtocolHandlerClassName(“org.apache.coyote.http11.Http11Protocol”)从而将Connector类实例变量protocolHandlerClassName值设置为org.apache.coyote.http11.Http11Protocol，接下来在Connector的构造方法中就会根据protocolHandlerClassName变量的值产生一个org.apache.coyote.http11.Http11Protocol对象，并将该对象赋值给Connector类的实例变量protocolHandler。在Http11Protocol类的构造方法中会产生一个org.apache.tomcat.util.net.JIoEndpoint对象：</p>
+<h2 id="Http11Protocol对象、JIoEndpoint对象"><a href="#Http11Protocol对象、JIoEndpoint对象" class="headerlink" title="Http11Protocol对象、JIoEndpoint对象"></a>Http11Protocol对象、JIoEndpoint对象</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Http11Protocol</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    endpoint = <span class="keyword">new</span> JIoEndpoint();  </span><br><span class="line">    cHandler = <span class="keyword">new</span> Http11ConnectionHandler(<span class="keyword">this</span>);  </span><br><span class="line">    ((JIoEndpoint) endpoint).setHandler(cHandler);  </span><br><span class="line">    setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);  </span><br><span class="line">    setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);  </span><br><span class="line">    setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="Connector的start方法startInternal"><a href="#Connector的start方法startInternal" class="headerlink" title="Connector的start方法startInternal"></a>Connector的start方法startInternal</h1><p>接下来容器启动各组件时会调用org.apache.catalina.connector.Connector的start方法，如前面分析Tomcat启动时所述，此时会调用org.apache.catalina.connector.Connector类的startInternal方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">startInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Validate settings before starting  </span></span><br><span class="line">    <span class="keyword">if</span> (getPort() &lt; <span class="number">0</span>) &#123;  </span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> LifecycleException(sm.getString(  </span><br><span class="line">                <span class="string">"coyoteConnector.invalidPort"</span>, Integer.valueOf(getPort())));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    setState(LifecycleState.STARTING);  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">        protocolHandler.start();  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">        String errPrefix = <span class="string">""</span>;  </span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">this</span>.service != <span class="keyword">null</span>) &#123;  </span><br><span class="line">            errPrefix += <span class="string">"service.getName(): \""</span> + <span class="keyword">this</span>.service.getName() + <span class="string">"\"; "</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> LifecycleException  </span><br><span class="line">            (errPrefix + <span class="string">" "</span> + sm.getString  </span><br><span class="line">             (<span class="string">"coyoteConnector.protocolHandlerStartFailed"</span>), e);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    mapperListener.start();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="protocolHandler的start方法、AbstractProtocol中的start方法"><a href="#protocolHandler的start方法、AbstractProtocol中的start方法" class="headerlink" title="protocolHandler的start方法、AbstractProtocol中的start方法"></a>protocolHandler的start方法、AbstractProtocol中的start方法</h2><p>在第12行，将会调用实例变量protocolHandler的start方法。在上面分析Connector类的构造函数时发现protocolHandler变量的值就是org.apache.coyote.http11.Http11Protocol对象，所以此时将会调用该类的start方法。在Http11Protocol类中没有定义start方法，这里将会调用其父类org.apache.coyote.AbstractProtocol中的start方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;  </span><br><span class="line">    <span class="keyword">if</span> (getLog().isInfoEnabled())  </span><br><span class="line">        getLog().info(sm.getString(<span class="string">"abstractProtocolHandler.start"</span>,  </span><br><span class="line">                getName()));  </span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">        endpoint.start();  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception ex) &#123;  </span><br><span class="line">        getLog().error(sm.getString(<span class="string">"abstractProtocolHandler.startError"</span>,  </span><br><span class="line">                getName()), ex);  </span><br><span class="line">        <span class="keyword">throw</span> ex;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="JIoEndpoint类的实例的startInternal方法"><a href="#JIoEndpoint类的实例的startInternal方法" class="headerlink" title="JIoEndpoint类的实例的startInternal方法"></a>JIoEndpoint类的实例的startInternal方法</h1><p>这里会调用endpoint对象的start方法，而endpoint是org.apache.tomcat.util.net.JIoEndpoint类的实例（在上面讲Http11Protocol类的构造方法时所提到），这里最终会执行该类的startInternal方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startInternal</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (!running) &#123;  </span><br><span class="line">        running = <span class="keyword">true</span>;  </span><br><span class="line">        paused = <span class="keyword">false</span>;  </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Create worker collection  </span></span><br><span class="line">        <span class="keyword">if</span> (getExecutor() == <span class="keyword">null</span>) &#123;  </span><br><span class="line">            createExecutor();  </span><br><span class="line">        &#125;  </span><br><span class="line">  </span><br><span class="line">        initializeConnectionLatch();  </span><br><span class="line">  </span><br><span class="line">        startAcceptorThreads();  </span><br><span class="line">  </span><br><span class="line">        <span class="comment">// Start async timeout thread  </span></span><br><span class="line">        Thread timeoutThread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> AsyncTimeout(),  </span><br><span class="line">                getName() + <span class="string">"-AsyncTimeout"</span>);  </span><br><span class="line">        timeoutThread.setPriority(threadPriority);  </span><br><span class="line">        timeoutThread.setDaemon(<span class="keyword">true</span>);  </span><br><span class="line">        timeoutThread.start();  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="产生并启动http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout两个线程"><a href="#产生并启动http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout两个线程" class="headerlink" title="产生并启动http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout两个线程"></a>产生并启动http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout两个线程</h2><p>正是在这里产生并启动本文开头提到的http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout两个线程。第17到22行就是产生和启动http-bio-8080-AsyncTimeout线程，第15行，这里调用父类org.apache.tomcat.util.net.AbstractEndpoint的startAcceptorThreads方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">startAcceptorThreads</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">int</span> count = getAcceptorThreadCount();  </span><br><span class="line">    acceptors = <span class="keyword">new</span> Acceptor[count];  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i++) &#123;  </span><br><span class="line">        acceptors[i] = createAcceptor();  </span><br><span class="line">        String threadName = getName() + <span class="string">"-Acceptor-"</span> + i;  </span><br><span class="line">        acceptors[i].setThreadName(threadName);  </span><br><span class="line">        Thread t = <span class="keyword">new</span> Thread(acceptors[i], threadName);  </span><br><span class="line">        t.setPriority(getAcceptorThreadPriority());  </span><br><span class="line">        t.setDaemon(getDaemon());  </span><br><span class="line">        t.start();  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在这里将产生和启动http-bio-8080-Acceptor-0线程。注意在构造该线程时第6行将会调用第20行的抽象方法，该方法的具体实现是在JIoEndpoint类中：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span>  </span><br><span class="line"><span class="keyword">protected</span> AbstractEndpoint.<span class="function">Acceptor <span class="title">createAcceptor</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Acceptor();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>同理，ajp-bio-8009-Acceptor-0和ajp-bio-8009-AsyncTimeout两个守护线程的产生和启动方式也是一致的，不再赘述。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/11/14/exchange/" rel="next" title="冒泡排序与快速排序">
+                <i class="fa fa-chevron-left"></i> 冒泡排序与快速排序
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/05/zklock/" rel="prev" title="分布式锁">
+                分布式锁 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#解析server-xml文件"><span class="nav-number">1.</span> <span class="nav-text">解析server.xml文件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Connector构造方法传入protocol"><span class="nav-number">2.</span> <span class="nav-text">Connector构造方法传入protocol</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#setProtocolHandlerClassName"><span class="nav-number">2.1.</span> <span class="nav-text">setProtocolHandlerClassName</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Http11Protocol对象、JIoEndpoint对象"><span class="nav-number">2.2.</span> <span class="nav-text">Http11Protocol对象、JIoEndpoint对象</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Connector的start方法startInternal"><span class="nav-number">3.</span> <span class="nav-text">Connector的start方法startInternal</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#protocolHandler的start方法、AbstractProtocol中的start方法"><span class="nav-number">3.1.</span> <span class="nav-text">protocolHandler的start方法、AbstractProtocol中的start方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JIoEndpoint类的实例的startInternal方法"><span class="nav-number">4.</span> <span class="nav-text">JIoEndpoint类的实例的startInternal方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#产生并启动http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout两个线程"><span class="nav-number">4.1.</span> <span class="nav-text">产生并启动http-bio-8080-Acceptor-0和http-bio-8080-AsyncTimeout两个线程</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

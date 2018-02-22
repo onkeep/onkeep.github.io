@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="流程1、StandardWrapperValue类的invoke()2、创建ApplicationFilterFactory3、调用ApplicationFilterFactory的方法createFilterChain()创建ApplicationFilterChain4、调用ApplicationFilterChain类的addFilter()方法为ApplicationFilterConfi">
+<meta name="keywords" content="Tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat中Filter实现分析">
+<meta property="og:url" content="http://yoursite.com/2017/09/12/filter/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="流程1、StandardWrapperValue类的invoke()2、创建ApplicationFilterFactory3、调用ApplicationFilterFactory的方法createFilterChain()创建ApplicationFilterChain4、调用ApplicationFilterChain类的addFilter()方法为ApplicationFilterConfi">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-64.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-65.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-67.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-68.png">
+<meta property="og:updated_time" content="2018-02-22T15:29:33.507Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tomcat中Filter实现分析">
+<meta name="twitter:description" content="流程1、StandardWrapperValue类的invoke()2、创建ApplicationFilterFactory3、调用ApplicationFilterFactory的方法createFilterChain()创建ApplicationFilterChain4、调用ApplicationFilterChain类的addFilter()方法为ApplicationFilterConfi">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-64.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/09/12/filter/"/>
+
+
+
+
+
+  <title>Tomcat中Filter实现分析 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-search">
+          <a href="/search" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-search"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/09/12/filter/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tomcat中Filter实现分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-12T22:34:00+08:00">
+                2017-09-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">Tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h1><p>1、StandardWrapperValue类的invoke()<br>2、创建ApplicationFilterFactory<br>3、调用ApplicationFilterFactory的方法createFilterChain()创建ApplicationFilterChain<br>4、调用ApplicationFilterChain类的addFilter()方法为ApplicationFilterConfig数组赋值<br>5、执行ApplicationFilterChain类的doFilter()方法，会调用internalDoFilter()方法。</p>
+<h1 id="详细分析"><a href="#详细分析" class="headerlink" title="详细分析"></a>详细分析</h1><a id="more"></a>
+<p>众所周知Tomcat中的Filter就是使用了责任链模式，创建一个Filter除了要在web.xml文件中做相应配置外，还需要实现javax.servlet.Filter接口。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestFilter</span> <span class="keyword">implements</span> <span class="title">Filter</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span><span class="params">(ServletRequest request, ServletResponse response,</span></span></span><br><span class="line"><span class="function"><span class="params">            FilterChain chain)</span> <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">        chain.doFilter(request, response);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">destroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(FilterConfig filterConfig)</span> <span class="keyword">throws</span> ServletException </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><img src="/images/pasted-64.png" alt="upload successful"><br>其实在真正执行到TestFilter类之前，会经过很多Tomcat内部的类。顺带提一下其实Tomcat的容器设置也是责任链模式，注意被红色方框所圈中的类，从Engine到Host再到Context一直到Wrapper都是通过一个链传递请求。被绿色方框所圈中的地方有一个名为ApplicationFilterChain的类，ApplicationFilterChain类所扮演的就是抽象处理者角色，而具体处理者角色由各个Filter扮演。</p>
+<h2 id="ApplicationFilterChain将所有的Filter存放在哪里？"><a href="#ApplicationFilterChain将所有的Filter存放在哪里？" class="headerlink" title="ApplicationFilterChain将所有的Filter存放在哪里？"></a>ApplicationFilterChain将所有的Filter存放在哪里？</h2><p>　　答案是保存在ApplicationFilterChain类中的一个ApplicationFilterConfig对象的数组中。<br>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * Filters.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> ApplicationFilterConfig[] filters = </span><br><span class="line">        <span class="keyword">new</span> ApplicationFilterConfig[<span class="number">0</span>];</span><br></pre></td></tr></table></figure></p>
+<h2 id="ApplicationFilterConfig对象又是什么呢？"><a href="#ApplicationFilterConfig对象又是什么呢？" class="headerlink" title="ApplicationFilterConfig对象又是什么呢？"></a>ApplicationFilterConfig对象又是什么呢？</h2><p>　  ApplicationFilterConfig是一个Filter容器。以下是ApplicationFilterConfig类的声明：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> ApplicationFilterConfig[] filters = </span><br><span class="line">        <span class="keyword">new</span> ApplicationFilterConfig[<span class="number">0</span>];</span><br></pre></td></tr></table></figure></p>
+<p>当一个web应用首次启动时ApplicationFilterConfig会自动实例化，它会从该web应用的web.xml文件中读取配置的Filter的信息，然后装进该容器。<br>　　刚刚看到在ApplicationFilterChain类中所创建的ApplicationFilterConfig数组长度为零</p>
+<h2 id="是在什么时候被重新赋值的呢？"><a href="#是在什么时候被重新赋值的呢？" class="headerlink" title="是在什么时候被重新赋值的呢？"></a>是在什么时候被重新赋值的呢？</h2><p>是在调用ApplicationFilterChain类的addFilter()方法时。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">addFilter</span><span class="params">(ApplicationFilterConfig filterConfig)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Prevent the same filter being added multiple times</span></span><br><span class="line">        <span class="keyword">for</span>(ApplicationFilterConfig filter:filters)</span><br><span class="line">            <span class="keyword">if</span>(filter==filterConfig)</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (n == filters.length) &#123;</span><br><span class="line">            ApplicationFilterConfig[] newFilters =</span><br><span class="line">                <span class="keyword">new</span> ApplicationFilterConfig[n + INCREMENT];</span><br><span class="line">            System.arraycopy(filters, <span class="number">0</span>, newFilters, <span class="number">0</span>, n);</span><br><span class="line">            filters = newFilters;</span><br><span class="line">        &#125;</span><br><span class="line">        filters[n++] = filterConfig;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>变量n用来记录当前过滤器链里面拥有的过滤器数目，默认情况下n等于0，ApplicationFilterConfig对象数组的长度也等于0，所以当第一次调用addFilter()方法时，if (n ==filters.length)的条件成立，ApplicationFilterConfig数组长度被改变。之后filters[n++] = filterConfig;将变量filterConfig放入ApplicationFilterConfig数组中并将当前过滤器链里面拥有的过滤器数目+1。</p>
+<h2 id="ApplicationFilterChain的addFilter-方法又是在什么地方被调用的呢？"><a href="#ApplicationFilterChain的addFilter-方法又是在什么地方被调用的呢？" class="headerlink" title="ApplicationFilterChain的addFilter()方法又是在什么地方被调用的呢？"></a>ApplicationFilterChain的addFilter()方法又是在什么地方被调用的呢？</h2><p>　　是在ApplicationFilterFactory类的createFilterChain()方法中。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> ApplicationFilterChain createFilterChain</span><br><span class="line">        (ServletRequest request, Wrapper wrapper, Servlet servlet) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// get the dispatcher type</span></span><br><span class="line">        DispatcherType dispatcher = <span class="keyword">null</span>; </span><br><span class="line">        <span class="keyword">if</span> (request.getAttribute(DISPATCHER_TYPE_ATTR) != <span class="keyword">null</span>) &#123;</span><br><span class="line">            dispatcher = (DispatcherType) request.getAttribute(DISPATCHER_TYPE_ATTR);</span><br><span class="line">        &#125;</span><br><span class="line">        String requestPath = <span class="keyword">null</span>;</span><br><span class="line">        Object attribute = request.getAttribute(DISPATCHER_REQUEST_PATH_ATTR);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (attribute != <span class="keyword">null</span>)&#123;</span><br><span class="line">            requestPath = attribute.toString();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// If there is no servlet to execute, return null</span></span><br><span class="line">        <span class="keyword">if</span> (servlet == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">boolean</span> comet = <span class="keyword">false</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Create and initialize a filter chain object</span></span><br><span class="line">        ApplicationFilterChain filterChain = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">if</span> (request <span class="keyword">instanceof</span> Request) &#123;</span><br><span class="line">            Request req = (Request) request;</span><br><span class="line">            comet = req.isComet();</span><br><span class="line">            <span class="keyword">if</span> (Globals.IS_SECURITY_ENABLED) &#123;</span><br><span class="line">                <span class="comment">// Security: Do not recycle</span></span><br><span class="line">                filterChain = <span class="keyword">new</span> ApplicationFilterChain();</span><br><span class="line">                <span class="keyword">if</span> (comet) &#123;</span><br><span class="line">                    req.setFilterChain(filterChain);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                filterChain = (ApplicationFilterChain) req.getFilterChain();</span><br><span class="line">                <span class="keyword">if</span> (filterChain == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    filterChain = <span class="keyword">new</span> ApplicationFilterChain();</span><br><span class="line">                    req.setFilterChain(filterChain);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// Request dispatcher in use</span></span><br><span class="line">            filterChain = <span class="keyword">new</span> ApplicationFilterChain();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        filterChain.setServlet(servlet);</span><br><span class="line"></span><br><span class="line">        filterChain.setSupport</span><br><span class="line">            (((StandardWrapper)wrapper).getInstanceSupport());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Acquire the filter mappings for this Context</span></span><br><span class="line">        StandardContext context = (StandardContext) wrapper.getParent();</span><br><span class="line">        FilterMap filterMaps[] = context.findFilterMaps();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// If there are no filter mappings, we are done</span></span><br><span class="line">        <span class="keyword">if</span> ((filterMaps == <span class="keyword">null</span>) || (filterMaps.length == <span class="number">0</span>))</span><br><span class="line">            <span class="keyword">return</span> (filterChain);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Acquire the information we will need to match filter mappings</span></span><br><span class="line">        String servletName = wrapper.getName();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Add the relevant path-mapped filters to this filter chain</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; filterMaps.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!matchDispatcher(filterMaps[i] ,dispatcher)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!matchFiltersURL(filterMaps[i], requestPath))</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)</span><br><span class="line">                context.findFilterConfig(filterMaps[i].getFilterName());</span><br><span class="line">            <span class="keyword">if</span> (filterConfig == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// FIXME - log configuration problem</span></span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">boolean</span> isCometFilter = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">if</span> (comet) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    isCometFilter = filterConfig.getFilter() <span class="keyword">instanceof</span> CometFilter;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    <span class="comment">// Note: The try catch is there because getFilter has a lot of </span></span><br><span class="line">                    <span class="comment">// declared exceptions. However, the filter is allocated much</span></span><br><span class="line">                    <span class="comment">// earlier</span></span><br><span class="line">                    Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);</span><br><span class="line">                    ExceptionUtils.handleThrowable(t);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (isCometFilter) &#123;</span><br><span class="line">                    filterChain.addFilter(filterConfig);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                filterChain.addFilter(filterConfig);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Add filters that match on servlet name second</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; filterMaps.length; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!matchDispatcher(filterMaps[i] ,dispatcher)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!matchFiltersServlet(filterMaps[i], servletName))</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            ApplicationFilterConfig filterConfig = (ApplicationFilterConfig)</span><br><span class="line">                context.findFilterConfig(filterMaps[i].getFilterName());</span><br><span class="line">            <span class="keyword">if</span> (filterConfig == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="comment">// FIXME - log configuration problem</span></span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">boolean</span> isCometFilter = <span class="keyword">false</span>;</span><br><span class="line">            <span class="keyword">if</span> (comet) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    isCometFilter = filterConfig.getFilter() <span class="keyword">instanceof</span> CometFilter;</span><br><span class="line">                &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                    <span class="comment">// Note: The try catch is there because getFilter has a lot of </span></span><br><span class="line">                    <span class="comment">// declared exceptions. However, the filter is allocated much</span></span><br><span class="line">                    <span class="comment">// earlier</span></span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (isCometFilter) &#123;</span><br><span class="line">                    filterChain.addFilter(filterConfig);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                filterChain.addFilter(filterConfig);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Return the completed filter chain</span></span><br><span class="line">        <span class="keyword">return</span> (filterChain);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>可以将如上代码分为两段，51行之前为第一段，51行之后为第二段。<br>　　第一段的主要目的是创建ApplicationFilterChain对象以及一些参数设置。<br>　　第二段的主要目的是从上下文中获取所有Filter信息，之后使用for循环遍历并调用filterChain.addFilter(filterConfig);将filterConfig放入ApplicationFilterChain对象的ApplicationFilterConfig数组中。</p>
+<h2 id="ApplicationFilterFactory类的createFilterChain-方法又是在什么地方被调用的呢？"><a href="#ApplicationFilterFactory类的createFilterChain-方法又是在什么地方被调用的呢？" class="headerlink" title="ApplicationFilterFactory类的createFilterChain()方法又是在什么地方被调用的呢？"></a>ApplicationFilterFactory类的createFilterChain()方法又是在什么地方被调用的呢？</h2><p>　　是在StandardWrapperValue类的invoke()方法中被调用的。</p>
+<p><img src="/images/pasted-65.png" alt="upload successful"></p>
+<p>由于invoke()方法较长，所以将很多地方省略。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">invoke</span><span class="params">(Request request, Response response)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> IOException, ServletException </span>&#123;</span><br><span class="line">   ...省略中间代码</span><br><span class="line">　　　　 <span class="comment">// Create the filter chain for this request</span></span><br><span class="line">        ApplicationFilterFactory factory =</span><br><span class="line">            ApplicationFilterFactory.getInstance();</span><br><span class="line">        ApplicationFilterChain filterChain =</span><br><span class="line">            factory.createFilterChain(request, wrapper, servlet);</span><br><span class="line">　　...省略中间代码</span><br><span class="line">         filterChain.doFilter(request.getRequest(), response.getResponse());</span><br><span class="line">　　...省略中间代码</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>那正常的流程应该是这样的：</p>
+<p>　　在StandardWrapperValue类的invoke()方法中调用ApplicationFilterFactory类的createFilterChain()方法———&gt;在ApplicationFilterChai类的createFilterChain()方法中调用ApplicationFilterChain类的addFilter()方法———&gt;在ApplicationFilterChain类的addFilter()方法中给ApplicationFilterConfig数组赋值。</p>
+<p><img src="/images/pasted-67.png" alt="upload successful"></p>
+<p>根据上面的代码可以看出StandardWrapperValue类的invoke()方法在执行完createFilterChain()方法后，会继续执行ApplicationFilterChain类的doFilter()方法，然后在doFilter()方法中会调用internalDoFilter()方法。<br>　　以下是internalDoFilter()方法的部分代码<br>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Call the next filter if there is one</span></span><br><span class="line">        <span class="keyword">if</span> (pos &lt; n) &#123;</span><br><span class="line">　　　　　　　<span class="comment">//拿到下一个Filter，将指针向下移动一位</span></span><br><span class="line">            <span class="comment">//pos它来标识当前ApplicationFilterChain（当前过滤器链）执行到哪个过滤器</span></span><br><span class="line">            ApplicationFilterConfig filterConfig = filters[pos++];</span><br><span class="line">            Filter filter = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">　　　　　　　　　 <span class="comment">//获取当前指向的Filter的实例</span></span><br><span class="line">                filter = filterConfig.getFilter();</span><br><span class="line">                support.fireInstanceEvent(InstanceEvent.BEFORE_FILTER_EVENT,</span><br><span class="line">                                          filter, request, response);</span><br><span class="line">                </span><br><span class="line">                <span class="keyword">if</span> (request.isAsyncSupported() &amp;&amp; <span class="string">"false"</span>.equalsIgnoreCase(</span><br><span class="line">                        filterConfig.getFilterDef().getAsyncSupported())) &#123;</span><br><span class="line">                    request.setAttribute(Globals.ASYNC_SUPPORTED_ATTR,</span><br><span class="line">                            Boolean.FALSE);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span>( Globals.IS_SECURITY_ENABLED ) &#123;</span><br><span class="line">                    <span class="keyword">final</span> ServletRequest req = request;</span><br><span class="line">                    <span class="keyword">final</span> ServletResponse res = response;</span><br><span class="line">                    Principal principal = </span><br><span class="line">                        ((HttpServletRequest) req).getUserPrincipal();</span><br><span class="line"></span><br><span class="line">                    Object[] args = <span class="keyword">new</span> Object[]&#123;req, res, <span class="keyword">this</span>&#125;;</span><br><span class="line">                    SecurityUtil.doAsPrivilege</span><br><span class="line">                        (<span class="string">"doFilter"</span>, filter, classType, args, principal);</span><br><span class="line">                    </span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">　　　　　　　　　　　　<span class="comment">//调用Filter的doFilter()方法  </span></span><br><span class="line">                    filter.doFilter(request, response, <span class="keyword">this</span>);</span><br><span class="line">                &#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里的filter.doFilter(request, response, this);就是调用我们前面创建的TestFilter中的doFilter()方法。而TestFilter中的doFilter()方法会继续调用chain.doFilter(request, response);方法，而这个chain其实就是ApplicationFilterChain,所以调用过程又回到了上面调用dofilter和调用internalDoFilter方法，这样执行直到里面的过滤器全部执行。<br>　　如果定义两个过滤器，则Debug结果如下：</p>
+<p><img src="/images/pasted-68.png" alt="upload successful"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/25/linuxio/" rel="next" title="Linux下的五种IO模型">
+                <i class="fa fa-chevron-left"></i> Linux下的五种IO模型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/10/05/ThreadLocal/" rel="prev" title="ThreadLocal">
+                ThreadLocal <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#流程"><span class="nav-number">1.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#详细分析"><span class="nav-number">2.</span> <span class="nav-text">详细分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ApplicationFilterChain将所有的Filter存放在哪里？"><span class="nav-number">2.1.</span> <span class="nav-text">ApplicationFilterChain将所有的Filter存放在哪里？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ApplicationFilterConfig对象又是什么呢？"><span class="nav-number">2.2.</span> <span class="nav-text">ApplicationFilterConfig对象又是什么呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#是在什么时候被重新赋值的呢？"><span class="nav-number">2.3.</span> <span class="nav-text">是在什么时候被重新赋值的呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ApplicationFilterChain的addFilter-方法又是在什么地方被调用的呢？"><span class="nav-number">2.4.</span> <span class="nav-text">ApplicationFilterChain的addFilter()方法又是在什么地方被调用的呢？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ApplicationFilterFactory类的createFilterChain-方法又是在什么地方被调用的呢？"><span class="nav-number">2.5.</span> <span class="nav-text">ApplicationFilterFactory类的createFilterChain()方法又是在什么地方被调用的呢？</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

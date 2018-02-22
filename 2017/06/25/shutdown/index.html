@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="用户线程与守护线程在默认的配置下启动完之后会看到后台实际上总共有6个线程在运行。即1个用户线程，剩下5个为守护线程(下图中的Daemon Thread)。 所谓守护线程，是指在程序运行的时候在后台提供一种通用服务的线程，比如垃圾回收线程。这种线程并不属于程序中不可或缺的部分，当所有的非守护线程结束时，程序也就终止了，同时会杀死进程中的所有守护线程。反过来说，只要任何非守护线程还在运行，程序就不会终">
+<meta name="keywords" content="Tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat关闭分析">
+<meta property="og:url" content="http://yoursite.com/2017/06/25/shutdown/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="用户线程与守护线程在默认的配置下启动完之后会看到后台实际上总共有6个线程在运行。即1个用户线程，剩下5个为守护线程(下图中的Daemon Thread)。 所谓守护线程，是指在程序运行的时候在后台提供一种通用服务的线程，比如垃圾回收线程。这种线程并不属于程序中不可或缺的部分，当所有的非守护线程结束时，程序也就终止了，同时会杀死进程中的所有守护线程。反过来说，只要任何非守护线程还在运行，程序就不会终">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-63.png">
+<meta property="og:updated_time" content="2018-02-22T08:59:47.956Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tomcat关闭分析">
+<meta name="twitter:description" content="用户线程与守护线程在默认的配置下启动完之后会看到后台实际上总共有6个线程在运行。即1个用户线程，剩下5个为守护线程(下图中的Daemon Thread)。 所谓守护线程，是指在程序运行的时候在后台提供一种通用服务的线程，比如垃圾回收线程。这种线程并不属于程序中不可或缺的部分，当所有的非守护线程结束时，程序也就终止了，同时会杀死进程中的所有守护线程。反过来说，只要任何非守护线程还在运行，程序就不会终">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-63.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/25/shutdown/"/>
+
+
+
+
+
+  <title>Tomcat关闭分析 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-search">
+          <a href="/search" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-search"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/25/shutdown/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tomcat关闭分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-25T19:19:00+08:00">
+                2017-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">Tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="用户线程与守护线程"><a href="#用户线程与守护线程" class="headerlink" title="用户线程与守护线程"></a>用户线程与守护线程</h1><p>在默认的配置下启动完之后会看到后台实际上总共有6个线程在运行。即1个用户线程，剩下5个为守护线程(下图中的Daemon Thread)。</p>
+<p><img src="/images/pasted-63.png" alt="upload successful"><br>所谓守护线程，是指在程序运行的时候在后台提供一种通用服务的线程，比如垃圾回收线程。这种线程并不属于程序中不可或缺的部分，当所有的非守护线程结束时，程序也就终止了，同时会杀死进程中的所有守护线程。反过来说，只要任何非守护线程还在运行，程序就不会终止。<br>用户线程和守护线程两者几乎没有区别，唯一的不同之处就在于虚拟机的离开：如果用户线程已经全部退出运行了，只剩下守护线程存在了，虚拟机也就退出了。因为没有了被守护者，守护线程也就没有工作可做了，也就没有继续运行程序的必要了。将线程转换为守护线程可以通过调用Thread对象的setDaemon(true)方法来实现。<br>     Tomcat的关闭正是利用了这个原理，即只要将那唯一的一个用户线程关闭，则整个应用就关闭了。<br><a id="more"></a></p>
+<h1 id="Catalina-setAwait-true-方法"><a href="#Catalina-setAwait-true-方法" class="headerlink" title="Catalina setAwait(true)方法"></a>Catalina setAwait(true)方法</h1><p>前面的文章里分析了daemon.load和daemon.start方法，这里请注意daemon.setAwait(true);这句，它的作用是通过反射调用org.apache.catalina.startup.Catalina类的setAwait(true)方法，最终将Catalina类的实例变量await设值为true。</p>
+<h2 id="Bootstrap的main方法："><a href="#Bootstrap的main方法：" class="headerlink" title="Bootstrap的main方法："></a>Bootstrap的main方法：</h2> <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(t2.equals(<span class="string">"start"</span>)) &#123;</span><br><span class="line">    daemon.setAwait(<span class="keyword">true</span>);<span class="comment">//通过反射调用org.apache.catalina.startup.Catalina类的setAwait(true)方法</span></span><br><span class="line">    daemon.load(args);</span><br><span class="line">    daemon.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Catalina类的setAwait方法代码："><a href="#Catalina类的setAwait方法代码：" class="headerlink" title="Catalina类的setAwait方法代码："></a>Catalina类的setAwait方法代码：</h2>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAwait</span><span class="params">(<span class="keyword">boolean</span> await)</span>  </span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> Exception </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    Class&lt;?&gt; paramTypes[] = <span class="keyword">new</span> Class[<span class="number">1</span>];  </span><br><span class="line">    paramTypes[<span class="number">0</span>] = Boolean.TYPE;  </span><br><span class="line">    Object paramValues[] = <span class="keyword">new</span> Object[<span class="number">1</span>];  </span><br><span class="line">    paramValues[<span class="number">0</span>] = Boolean.valueOf(await);  </span><br><span class="line">    Method method =  </span><br><span class="line">        catalinaDaemon.getClass().getMethod(<span class="string">"setAwait"</span>, paramTypes);  </span><br><span class="line">    method.invoke(catalinaDaemon, paramValues);  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如前文分析，Tomcat启动时会调用org.apache.catalina.startup.Catalina类的start方法，看下这个方法的代码：</p>
+<p>二、Catalina类的start方法<br>  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * Start a new server instance. </span></span><br><span class="line"><span class="comment"> */</span>  </span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (getServer() == <span class="keyword">null</span>) &#123;  </span><br><span class="line">        load();  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (getServer() == <span class="keyword">null</span>) &#123;  </span><br><span class="line">        log.fatal(<span class="string">"Cannot start server. Server instance is not configured."</span>);  </span><br><span class="line">        <span class="keyword">return</span>;  </span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">    <span class="comment">// Start the new server  </span></span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">        getServer().start();  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (LifecycleException e) &#123;  </span><br><span class="line">        log.fatal(sm.getString(<span class="string">"catalina.serverStartFail"</span>), e);  </span><br><span class="line">        <span class="keyword">try</span> &#123;  </span><br><span class="line">            getServer().destroy();  </span><br><span class="line">        &#125; <span class="keyword">catch</span> (LifecycleException e1) &#123;  </span><br><span class="line">            log.debug(<span class="string">"destroy() failed for failed Server "</span>, e1);  </span><br><span class="line">        &#125;  </span><br><span class="line">        <span class="keyword">return</span>;  </span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">if</span> (await) &#123;  </span><br><span class="line">        await();  </span><br><span class="line">        stop();  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>前文分析启动时发现通过第19行getServer().start()的这次方法调用，Tomcat接下来会一步步启动所有在配置文件中配置的组件。后面的代码没有分析，这里请关注最后第52到55行，上面说到已经将Catalina类的实例变量await设值为true，所以这里将会执行Catalina类的await方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">await</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    getServer().await();    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="StandardServer类的await方法"><a href="#StandardServer类的await方法" class="headerlink" title="StandardServer类的await方法"></a>StandardServer类的await方法</h1><p>该方法就一句话，意思是调用org.apache.catalina.core.StandardServer类的await方法：<br>这段代码就不一一分析，总体作用如方法前的注释所说，即“一直等待到接收到一个正确的关闭命令后该方法将会返回。这样会使主线程一直存活——监听http连接的线程池是守护线程”。<br>熟悉Java的Socket编程的话对这段代码就很容易理解，就是默认地址（地址值由实例变量address定义，默认为localhost）的默认的端口（端口值由实例变量port定义，默认为8005）上监听Socket连接，当发现监听到的连接的输入流中的内容与默认配置的值匹配（该值默认为字符串SHUTDOWN）则跳出循环，该方法返回（第103到107行）。否则该方法会一直循环执行下去。<br>一般来说该用户主线程会阻塞（第56行）直到有访问localhost:8005的连接出现。正因为如此才出现开头看见的主线程一直Running的情况，而因为这个线程一直Running，其它守护线程也会一直存在。<br>说完这个线程的产生，接下来看看这个线程的关闭，按照上面的分析，这个线程提供了一个关闭机制，即只要访问localhost:8005，并且发送一个内容为SHUTDOWN的字符串，就可以关闭它了。</p>
+<h1 id="Tomcat的shutdown-sh脚本"><a href="#Tomcat的shutdown-sh脚本" class="headerlink" title="Tomcat的shutdown.sh脚本"></a>Tomcat的shutdown.sh脚本</h1><p>执行Bootstrap类的main方法，传入stop，执行Catalina类stopServer方法<br>Tomcat正是这么做的，一般来说关闭Tomcat通过执行shutdown.bat或shutdown.sh脚本，关于这段脚本可参照分析启动脚本那篇文章，机制类似，最终会执行org.apache.catalina.startup.Bootstrap类的main方法，并传入入参”stop”，看下本文第2张图片中org.apache.catalina.startup.Bootstrap类的第458行，接着将调用org.apache.catalina.startup.Catalina类stopServer方法：</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/20/consisthash.md/" rel="next" title="一致性hash算法">
+                <i class="fa fa-chevron-left"></i> 一致性hash算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/27/start/" rel="prev" title="Tomcat启动分析">
+                Tomcat启动分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#用户线程与守护线程"><span class="nav-number">1.</span> <span class="nav-text">用户线程与守护线程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Catalina-setAwait-true-方法"><span class="nav-number">2.</span> <span class="nav-text">Catalina setAwait(true)方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bootstrap的main方法："><span class="nav-number">2.1.</span> <span class="nav-text">Bootstrap的main方法：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Catalina类的setAwait方法代码："><span class="nav-number">2.2.</span> <span class="nav-text">Catalina类的setAwait方法代码：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#StandardServer类的await方法"><span class="nav-number">3.</span> <span class="nav-text">StandardServer类的await方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tomcat的shutdown-sh脚本"><span class="nav-number">4.</span> <span class="nav-text">Tomcat的shutdown.sh脚本</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

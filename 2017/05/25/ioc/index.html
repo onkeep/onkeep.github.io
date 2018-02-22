@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Spring," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="BeanFactory介绍其中BeanFactory作为最顶层的一个接口类，它定义了IOC容器的基本功能规范。BeanFactory 有三个子类：ListableBeanFactory、HierarchicalBeanFactory 和AutowireCapableBeanFactory 1、ConfigurableBeanFactory继承HierarchicalBeanFactory 2、Co">
+<meta name="keywords" content="Spring">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IOC">
+<meta property="og:url" content="http://yoursite.com/2017/05/25/ioc/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="BeanFactory介绍其中BeanFactory作为最顶层的一个接口类，它定义了IOC容器的基本功能规范。BeanFactory 有三个子类：ListableBeanFactory、HierarchicalBeanFactory 和AutowireCapableBeanFactory 1、ConfigurableBeanFactory继承HierarchicalBeanFactory 2、Co">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-78.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-79.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-80.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-81.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-82.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-83.png">
+<meta property="og:updated_time" content="2018-02-22T13:21:23.959Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IOC">
+<meta name="twitter:description" content="BeanFactory介绍其中BeanFactory作为最顶层的一个接口类，它定义了IOC容器的基本功能规范。BeanFactory 有三个子类：ListableBeanFactory、HierarchicalBeanFactory 和AutowireCapableBeanFactory 1、ConfigurableBeanFactory继承HierarchicalBeanFactory 2、Co">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-78.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/25/ioc/"/>
+
+
+
+
+
+  <title>IOC | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-search">
+          <a href="/search" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-search"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/25/ioc/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">IOC</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-25T23:11:00+08:00">
+                2017-05-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Spring/" itemprop="url" rel="index">
+                    <span itemprop="name">Spring</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="BeanFactory介绍"><a href="#BeanFactory介绍" class="headerlink" title="BeanFactory介绍"></a>BeanFactory介绍</h1><p><img src="/images/pasted-78.png" alt="upload successful"><br>其中BeanFactory作为最顶层的一个接口类，它定义了IOC容器的基本功能规范。<br>BeanFactory 有三个子类：ListableBeanFactory、HierarchicalBeanFactory 和AutowireCapableBeanFactory</p>
+<p>1、ConfigurableBeanFactory继承HierarchicalBeanFactory</p>
+<p>2、ConfigurableListableBeanFactory继承ListableBeanFactory, AutowireCapableBeanFactory, ConfigurableBeanFactory</p>
+<p>3、DefaultListableBeanFactory继承AbstractAutowireCapableBeanFactory，实现ConfigurableListableBeanFactory, BeanDefinitionRegistry, Serializable接口<br><a id="more"></a><br>BeanFactory接口定义了基本的Ioc容器的规范。在这个接口定义中，包括了getBean()这样的Ioc容器的基本方法（通过这个方法可以从容器中取得Bean）。而HierarchicalBeanFactory接口在继承了BeanFactory的基本接口后，增加了getParentBeanFactory()的接口功能，使BeanFactory具备了双亲Ioc容器的管理功能。在接下来的ConfigurableBeanFactory接口中，主要定义了一些对BeanFactory的配置功能，比如通过setParentBeanFactory()设置双亲Ioc容器，通过addBeanPostProcessor()配置Bean后置处理器，等等。通过这些接口设计的叠加，定义了BeanFactory就是最简单的Ioc容器的基本功能。</p>
+<h1 id="ApplicationContext介绍"><a href="#ApplicationContext介绍" class="headerlink" title="ApplicationContext介绍"></a>ApplicationContext介绍</h1><p><img src="/images/pasted-79.png" alt="upload successful"><br>应用上下文，作为容器的高级形态存在，增加了许多面向框架的特性</p>
+<p>   第二条接口设计主线是，以ApplicationContext作为核心的接口设计，这里涉及的主要接口设计有，从BeanFactory到ListableBeanFactory，再到ApplicationContext，再到我们常用的WebApplicationContext或者ConfigurableApplicationContext接口。我们常用的应用基本都是org.framework.context 包里的WebApplicationContext或者ConfigurableApplicationContext实现。在这个接口体现中，ListableBeanFactory和HierarchicalBeanFactory两个接口，连接BeanFactory接口定义和ApplicationContext应用的接口定义。在ListableBeanFactory接口中，细化了许多BeanFactory的接口功能，比如定义了getBeanDefinitionNames()接口方法；对于ApplicationContext接口，它通过继承MessageSource、EnvironmentCapable、ApplicationEventPublisher接口，在BeanFactory简单Ioc容器的基础上添加了许多对高级容器的特性支持。</p>
+<h2 id="ApplicationContext接口特点"><a href="#ApplicationContext接口特点" class="headerlink" title="ApplicationContext接口特点"></a>ApplicationContext接口特点</h2><p>extends EnvironmentCapable, ListableBeanFactory, HierarchicalBeanFactory, MessageSource, ApplicationEventPublisher, ResourcePatternResolver<br>ApplicationContext的实现类种类太多，但它们的核心都是将对象工厂功能委托给BeanFactory的实现类DefaultListableBeanFactory</p>
+<p>1.支持不同的信息源。扩展了MessageSource接口，这个接口为ApplicationContext提供了很多信息源的扩展功能，比如：国际化的实现为多语言版本的应用提供服务。 </p>
+<p>2.访问资源。这一特性主要体现在ResourcePatternResolver接口上，对Resource和ResourceLoader的支持，这样我们可以从不同地方得到Bean定义资源。  这种抽象使用户程序可以灵活地定义Bean定义信息，尤其是从不同的IO途径得到Bean定义信息。这在接口上看不出来，不过一般来说，具体ApplicationContext都是  继承了DefaultResourceLoader的子类。因为DefaultResourceLoader是AbstractApplicationContext的基类，关于Resource后面会有更详细的介绍。 </p>
+<p>3.支持应用事件。继承了接口ApplicationEventPublisher，为应用环境引入了事件机制，这些事件和Bean的生命周期的结合为Bean的管理提供了便利。 </p>
+<p>4.附件服务。EnvironmentCapable里的服务让基本的Ioc功能更加丰富。</p>
+<p>5.ListableBeanFactory和HierarchicalBeanFactory是继承的主要容器。</p>
+<h2 id="最常被使用的ApplicationContext接口实现类："><a href="#最常被使用的ApplicationContext接口实现类：" class="headerlink" title="最常被使用的ApplicationContext接口实现类："></a>最常被使用的ApplicationContext接口实现类：</h2><h2 id="FileSystemXmlApplicationContext"><a href="#FileSystemXmlApplicationContext" class="headerlink" title="FileSystemXmlApplicationContext"></a>FileSystemXmlApplicationContext</h2><p>该容器从XML文件中加载已被定义的bean。在这里，你需要提供给构造器XML文件的完整路径。  </p>
+<h2 id="ClassPathXmlApplicationContext"><a href="#ClassPathXmlApplicationContext" class="headerlink" title="ClassPathXmlApplicationContext"></a>ClassPathXmlApplicationContext</h2><p>该容器从XML文件中加载已被定义的bean。在这里，你不需要提供XML文件的完整路径，只需正确配置CLASSPATH    环境变量即可，因为，容器会从CLASSPATH中搜索bean配置文件。 </p>
+<h2 id="XmlWebApplicationContext"><a href="#XmlWebApplicationContext" class="headerlink" title="XmlWebApplicationContext"></a>XmlWebApplicationContext</h2><p>该容器会在一个 web 应用程序的范围内加载在XML文件中</p>
+<h1 id="BeanDefinition介绍"><a href="#BeanDefinition介绍" class="headerlink" title="BeanDefinition介绍"></a>BeanDefinition介绍</h1><p>管理基于Spring的应用中的各种对象以及它们之间的依赖关系，抽象了我们对Bean的定义，一种数据抽象</p>
+<h1 id="容器的初始化"><a href="#容器的初始化" class="headerlink" title="容器的初始化"></a>容器的初始化</h1><p>setConfigLocations和refresh<br>    FileSystemXmlApplicationContext通过调用其父类AbstractApplicationContext的refresh()函数启动整个IoC容器对Bean定义的载入过程<br>    refresh定义在AbstractApplicationContext类中，它详细描述了整个ApplicationContext的初始化过程，比如BeanFactory的更新、MessageSource和PostProcessor的注册等。这里看起来像是对ApplicationContext进行初始化的模版或执行提纲，这个执行过程为Bean的生命周期管理提供了条件。<br>setConfigLocations方法主要用于载入XML。</p>
+<p><img src="/images/pasted-80.png" alt="upload successful"></p>
+<p>AbstractApplicationContext的obtainFreshBeanFactory()方法调用子类容器的refreshBeanFactory()方法，启动容器载入Bean定义资源文件的过程<br>AbstractApplicationContext类中只抽象定义了refreshBeanFactory()方法，容器真正调用的是其子类AbstractRefreshableApplicationContext实现的refreshBeanFactory()方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">final</span> <span class="keyword">void</span> <span class="title">refreshBeanFactory</span><span class="params">()</span> <span class="keyword">throws</span> BeansException </span>&#123;  </span><br><span class="line">        <span class="keyword">if</span> (hasBeanFactory()) &#123;<span class="comment">//如果已经有容器，销毁容器中的bean，关闭容器  </span></span><br><span class="line">           destroyBeans();  </span><br><span class="line">           closeBeanFactory();  </span><br><span class="line">       &#125;  </span><br><span class="line">   <span class="keyword">try</span> &#123;  </span><br><span class="line">            <span class="comment">//创建IoC容器  </span></span><br><span class="line">            DefaultListableBeanFactory beanFactory = createBeanFactory();  </span><br><span class="line">            beanFactory.setSerializationId(getId());  </span><br><span class="line">            <span class="comment">//对IoC容器进行定制化，如设置启动参数，开启注解的自动装配等  </span></span><br><span class="line">            customizeBeanFactory(beanFactory);  </span><br><span class="line">            <span class="comment">//调用载入Bean定义的方法，主要这里又使用了一个委派模式，在当前类中只定义了抽象的loadBeanDefinitions方，具体的实现调用子类容器  </span></span><br><span class="line">            loadBeanDefinitions(beanFactory);  </span><br><span class="line">            <span class="keyword">synchronized</span> (<span class="keyword">this</span>.beanFactoryMonitor) &#123;  </span><br><span class="line">            <span class="keyword">this</span>.beanFactory = beanFactory;  </span><br><span class="line">            &#125;  </span><br><span class="line">        &#125;  </span><br><span class="line">         <span class="keyword">catch</span> (IOException ex) &#123;  </span><br><span class="line">            <span class="keyword">throw</span>    <span class="keyword">new</span> ApplicationContextException(<span class="string">"I/O error parsing bean definition source for "</span> getDisplayName(), ex);  </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在这个方法中，先判断BeanFactory是否存在，如果存在则先销毁beans并关闭beanFactory，接着创建DefaultListableBeanFactory，并调用loadBeanDefinitions(beanFactory)装载bean</p>
+<h2 id="Resource定位、BeanDefinition载入、BeanDefinition注册"><a href="#Resource定位、BeanDefinition载入、BeanDefinition注册" class="headerlink" title="Resource定位、BeanDefinition载入、BeanDefinition注册"></a>Resource定位、BeanDefinition载入、BeanDefinition注册</h2><p><img src="/images/pasted-81.png" alt="upload successful"><br>   IOC容器初始化的入口在容器实现中的 refresh()调用来完成<br>    对 bean 定义载入 IOC 容器使用的方法是 loadBeanDefinition,其中的大致过程如下<br>Resource定位<br>    我们一般使用外部资源来描述Bean对象，所以IOC容器第一步就是需要定位Resource外部资源。Resource的定位其实就是BeanDefinition的资源定位，它是由ResourceLoader通过统一的Resource接口来完成的，这个Resource对各种形式的BeanDefinition的使用都提供了统一接口。<br>    通过 ResourceLoader 来完成资源文件位置的定位，DefaultResourceLoader 是默认的实现，同时上下文本身就给出了 ResourceLoader 的实现，可以从类路径，文件系统, URL 等方式来定为资源位置。如果是 XmlBeanFactory作为 IOC 容器，那么需要为它指定 bean 定义的资源，也就是说 bean 定义文件时通过抽象成 Resource 来被 IOC 容器处理的<br>载入<br>    第二个过程就是BeanDefinition的载入。BeanDefinitionReader读取、解析Resource定位的资源，也就是将用户定义好的Bean表示成IOC容器的内部数据结构也就是BeanDefinition。在IOC容器内部维护着一个BeanDefinition Map的数据结构，通过这样的数据结构，IOC容器能够对Bean进行更好的管理。<br>在配置文件中每一个<bean>都对应着一个BeanDefinition对象。<br>    容器通过 BeanDefinitionReader来完成定义信息的解析和 Bean 信息的注册,往往使用的是XmlBeanDefinitionReader 来解析 bean 的 xml 定义文件 - 实际的处理过程是委托给 BeanDefinitionParserDelegate 来完成的，从而得到 bean 的定义信息，这些信息在 Spring 中使用 BeanDefinition 对象来表示 - 这个名字可以让我们想到loadBeanDefinition,RegisterBeanDefinition  这些相关的方法 - 他们都是为处理 BeanDefinitin 服务的<br>注册<br>    第三个过程则是注册，即向IOC容器注册这些BeanDefinition，这个过程是通过BeanDefinitionRegistery接口来实现的。在IOC容器内部其实是将第二个过程解析得到的BeanDefinition注入到一个HashMap容器中，IOC容器就是通过这个HashMap来维护这些BeanDefinition的。在这里需要注意的一点是这个过程并没有完成依赖注入，依赖注册是发生在应用第一次调用getBean向容器所要Bean时。当然我们可以通过设置预处理，即对某个Bean设置lazyinit属性，那么这个Bean的依赖注入就会在容器初始化的时候完成。<br>  Map<string, beandefinition=""> beanDefinitionMap = new ConcurrentHashMap<string, beandefinition="">();<br>    容器解析得到 BeanDefinitionIoC 以后，需要把它在 IOC 容器中注册，这由 IOC 实现 BeanDefinitionRegistry 接口来实现。注册过程就是在 IOC 容器内部维护的一个HashMap 来保存得到的 BeanDefinition 的过程。这个 HashMap 是 IoC 容器持有 bean 信息的场所，以后对 bean 的操作都是围绕这个HashMap 来实现的.然后我们就可以通过 BeanFactory 和 ApplicationContext 来享受到 Spring IOC 的服务了</string,></string,></bean></p>
+<p>编程式使用IOC容器<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ClassPathResource resource = <span class="keyword">new</span> ClassPathResource(<span class="string">"bean.xml"</span>);  </span><br><span class="line">DefaultListableBeanFactory factory = <span class="keyword">new</span> DefaultListableBeanFactory();  </span><br><span class="line">XmlBeanDefinitionReader reader = <span class="keyword">new</span> XmlBeanDefinitionReader(factory);  </span><br><span class="line">reader.loadBeanDefinitions(resource);</span><br></pre></td></tr></table></figure></p>
+<p>1、创建IOC配置文件的抽闲资源，也就是Resource接口。<br>2、创建BeanFactory，DefaultListtableBeanFactory是BeanFactory模式实现类。<br>3、创建一个BeanDefinitionReader对象，该对象为BeanDefinition的读取器。xml文件就使用XMLBeanDefinitionReader。<br>4、使用Reader来装载配置文件。loadBeanDefinitions就包括了资源文件的解析和注入过程。</p>
+<p><img src="/images/pasted-82.png" alt="upload successful"></p>
+<p>左边黄色部分是 ApplicationContext 体系继承结构，右边是 BeanFactory 的结构体系。</p>
+<h1 id="IOC容器的依赖注入"><a href="#IOC容器的依赖注入" class="headerlink" title="IOC容器的依赖注入"></a>IOC容器的依赖注入</h1><p>BeanDefinition是数据，getBean是依赖注入的起点，之后会调用createBean，在这个过程中，Bean对象会依据BeanDefinition定义的要求生成，在AbstractAutowireCapableBeanFactory实现了这个createBean，不但生成了这个Bean还对Bean初始化进行了处理，比如实现了init-method属性定义，Bean后置处理器等。</p>
+<h1 id="IOC容器的其他特性"><a href="#IOC容器的其他特性" class="headerlink" title="IOC容器的其他特性"></a>IOC容器的其他特性</h1><h2 id="BeanPostProcessor与BeanFactoryPostProcessor的区别"><a href="#BeanPostProcessor与BeanFactoryPostProcessor的区别" class="headerlink" title="BeanPostProcessor与BeanFactoryPostProcessor的区别"></a>BeanPostProcessor与BeanFactoryPostProcessor的区别</h2><p>BeanPostProcessor修改的是当我们初始化Bean的时候，“临时”修改bean的属性<br>BeanFactoryPostProcessor修改的是BeanFactory中的BeanDefinnition</p>
+<h2 id="Beanfactory-和-Factory-bean"><a href="#Beanfactory-和-Factory-bean" class="headerlink" title="Beanfactory 和 Factory bean"></a>Beanfactory 和 Factory bean</h2><p>   BeanFactory 指的是 IOC 容器的编程抽象，比如 ApplicationContext， XmlBeanFactory 等，这些都是 IOC 容器的具体表现，需要使用什么样的容器由客户决定,但 Spring 为我们提供了丰富的选择。<br>    FactoryBean只是一个可以在 IOC而容器中被管理的一个 bean,是对各种处理过程和资源使用的抽象<br>    Factory bean在需要时产生另一个对象，而不返回 FactoryBean本身,我们可以把它看成是一个抽象工厂，对它的调用返回的是工厂生产的产品。所有的 Factory bean 都实现特殊的org.springframework.beans.factory.FactoryBean 接口，当使用容器中 factory bean 的时候，该容器不会返回 factory bean 本身,而是返回其生成的对象。Spring 包括了大部分的通用资源和服务访问抽象的 Factory bean 的实现，其中包括:对 JNDI 查询的处理，对代理对象的处理，对事务性代理的处理，对 RMI 代理的处理等，这些我们都可以看成是具体的工厂,看成是SPRING 为我们建立好的工厂。也就是说 Spring 通过使用抽象工厂模式为我们准备了一系列工厂来生产一些特定的对象,免除我们手工重复的工作，我们要使用时只需要在 IOC 容器里配置好就能很方便的使用了</p>
+<h2 id="依赖注入发生的时间"><a href="#依赖注入发生的时间" class="headerlink" title="依赖注入发生的时间"></a>依赖注入发生的时间</h2><p>   当Spring IoC容器完成了Bean定义资源的定位、载入和解析注册以后，IoC容器中已经管理类Bean定义的相关数据，但是此时IoC容器还没有对所管理的Bean进行依赖注入，依赖注入在以下两种情况发生：<br>    (1).用户第一次通过getBean方法向IoC容索要Bean时，IoC容器触发依赖注入。<br>    (2).当用户在Bean定义资源中为<bean>元素配置了lazy-init false属性，即让容器在解析注册Bean定义时进行预实例化，触发依赖注入。在容器refresh方法中,finishBeanFactoryInitialization，封装了对lazy-init属性的处理</bean></p>
+<h2 id="Bean实例对象的创建"><a href="#Bean实例对象的创建" class="headerlink" title="Bean实例对象的创建"></a>Bean实例对象的创建</h2><p>   AbstractBeanFactory通过getBean向IoC容器获取被管理的Bean，如果Bean定义的单态模式(Singleton)，则容器在创建之前先从缓存中查找，以确保整个容器中只存在一个实例对象。如果Bean定义的是原型模式(Prototype)，则容器每次都会创建一个新的实例对象。只是定义了根据Bean定义的模式，采取的不同创建Bean实例对象的策略，具体的Bean实例对象的创建过程由实现了AbstractAutowireCapableBeanFactory完成，我们继续分析AbstractAutowireCapableBeanFactory的createBean方法创建容器指定的Bean实例对象，同时还对创建的Bean实例对象进行初始化处理<br>(1).createBeanInstance：生成Bean所包含的java对象实例。<br>(2).populateBean ：对Bean属性的依赖注入进行处理。依赖注入的具体实现交由其实现类BeanWrapperImpl来完成，BeanWrapperImpl对Bean的属性值注入<br>(3).initializeBean ：初始化Bean（ postProcessBeforeInitialization，调用InitializingBean的afterPropertiesSet  2、调用自定义的init-method，postProcessAfterInitialization）</p>
+<h2 id="Spring-Bean的生命周期"><a href="#Spring-Bean的生命周期" class="headerlink" title="Spring Bean的生命周期"></a>Spring Bean的生命周期</h2><p><img src="/images/pasted-83.png" alt="upload successful"></p>
+<p>1：Bean的建立：<br>容器寻找Bean的定义信息并将其实例化。</p>
+<p>2：属性注入：<br>使用依赖注入，Spring按照Bean定义信息配置Bean所有属性</p>
+<p>3：BeanNameAware的setBeanName()：<br>如果Bean类有实现org.springframework.beans.BeanNameAware接口，工厂调用Bean的setBeanName()方法传递Bean的ID。</p>
+<p>4：BeanFactoryAware的setBeanFactory()：<br>如果Bean类有实现org.springframework.beans.factory.BeanFactoryAware接口，工厂调用setBeanFactory()方法传入工厂自身。</p>
+<p>5：BeanPostProcessor的postProcessBeforeInitialization()<br>如果有org.springframework.beans.factory.config.BeanPostProcessors和Bean关联，那么其postProcessBeforeInitialization()方法将被将被调用。</p>
+<p>6：initializingBean的afterPropertiesSet()：<br>如果Bean类已实现org.springframework.beans.factory.InitializingBean接口，则执行他的afterProPertiesSet()方法</p>
+<p>7：Bean定义文件中定义init-method：<br>可以在Bean定义文件中使用”init-method”属性设定方法名称例如：<br>如果有以上设置的话，则执行到这个阶段，就会执行initBean()方法</p>
+<p>8：BeanPostProcessor的postProcessAfterInitialization()<br>如果有任何的BeanPostProcessors实例与Bean实例关联，则执行BeanPostProcessors实例的ProcessaAfterInitialization()方法</p>
+<p>1：DisposableBean的destroy()<br>在容器关闭时，如果Bean类有实现org.springframework.beans.factory.DisposableBean接口，则执行他的destroy()方法<br>2：Bean定义文件中定义destroy-method<br>在容器关闭时，可以在Bean定义文件中使用”destroy-method”属性设定方法名称</p>
+<h2 id="Autowire和Resource"><a href="#Autowire和Resource" class="headerlink" title="Autowire和Resource"></a>Autowire和Resource</h2><p>@Autowire 默认按照类型装配，默认情况下它要求依赖对象必须存在如果允许为null，可以设置它required属性为false，如果我们想使用按照名称装配，可 以结合@Qualifier注解一起使用;</p>
+<p>@Resource默认按照名称装配，当找不到与名称匹配的bean才会按照类型装配，可以通过name属性指定，如果没有指定name属 性，当注解标注在字段上，即默认取字段的名称作为bean名称寻找依赖对象，当注解标注在属性的setter方法上，即默认取属性名作为bean名称寻找 依赖对象.<br>注意：如果没有指定name属性，并且按照默认的名称仍然找不到依赖的对象时候，会回退到按照类型装配，但一旦指定了name属性，就只能按照名称 装配了.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Spring/" rel="tag"># Spring</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/24/mvc/" rel="next" title="MVC">
+                <i class="fa fa-chevron-left"></i> MVC
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/10/jiazai/" rel="prev" title="Tomcat web应用加载原理">
+                Tomcat web应用加载原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#BeanFactory介绍"><span class="nav-number">1.</span> <span class="nav-text">BeanFactory介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ApplicationContext介绍"><span class="nav-number">2.</span> <span class="nav-text">ApplicationContext介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ApplicationContext接口特点"><span class="nav-number">2.1.</span> <span class="nav-text">ApplicationContext接口特点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最常被使用的ApplicationContext接口实现类："><span class="nav-number">2.2.</span> <span class="nav-text">最常被使用的ApplicationContext接口实现类：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#FileSystemXmlApplicationContext"><span class="nav-number">2.3.</span> <span class="nav-text">FileSystemXmlApplicationContext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ClassPathXmlApplicationContext"><span class="nav-number">2.4.</span> <span class="nav-text">ClassPathXmlApplicationContext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XmlWebApplicationContext"><span class="nav-number">2.5.</span> <span class="nav-text">XmlWebApplicationContext</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#BeanDefinition介绍"><span class="nav-number">3.</span> <span class="nav-text">BeanDefinition介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#容器的初始化"><span class="nav-number">4.</span> <span class="nav-text">容器的初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Resource定位、BeanDefinition载入、BeanDefinition注册"><span class="nav-number">4.1.</span> <span class="nav-text">Resource定位、BeanDefinition载入、BeanDefinition注册</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IOC容器的依赖注入"><span class="nav-number">5.</span> <span class="nav-text">IOC容器的依赖注入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IOC容器的其他特性"><span class="nav-number">6.</span> <span class="nav-text">IOC容器的其他特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#BeanPostProcessor与BeanFactoryPostProcessor的区别"><span class="nav-number">6.1.</span> <span class="nav-text">BeanPostProcessor与BeanFactoryPostProcessor的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Beanfactory-和-Factory-bean"><span class="nav-number">6.2.</span> <span class="nav-text">Beanfactory 和 Factory bean</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖注入发生的时间"><span class="nav-number">6.3.</span> <span class="nav-text">依赖注入发生的时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bean实例对象的创建"><span class="nav-number">6.4.</span> <span class="nav-text">Bean实例对象的创建</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring-Bean的生命周期"><span class="nav-number">6.5.</span> <span class="nav-text">Spring Bean的生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Autowire和Resource"><span class="nav-number">6.6.</span> <span class="nav-text">Autowire和Resource</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="web服务器解释在网络环境下可以向发出请求的浏览器提供文档的程序浏览器和Web服务器的一次交互过程分四步：连接、请求、响应、关闭。1234567891011121314151617181920212223ServerSocket serverSocket  = new ServerSocket(8080, 1,          InetAddress.getByName(“localhost”)">
+<meta name="keywords" content="Tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat Socket编程">
+<meta property="og:url" content="http://yoursite.com/2017/06/18/socket/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="web服务器解释在网络环境下可以向发出请求的浏览器提供文档的程序浏览器和Web服务器的一次交互过程分四步：连接、请求、响应、关闭。1234567891011121314151617181920212223ServerSocket serverSocket  = new ServerSocket(8080, 1,          InetAddress.getByName(“localhost”)">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-69.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-70.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-71.png">
+<meta property="og:updated_time" content="2018-02-22T09:30:20.698Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tomcat Socket编程">
+<meta name="twitter:description" content="web服务器解释在网络环境下可以向发出请求的浏览器提供文档的程序浏览器和Web服务器的一次交互过程分四步：连接、请求、响应、关闭。1234567891011121314151617181920212223ServerSocket serverSocket  = new ServerSocket(8080, 1,          InetAddress.getByName(“localhost”)">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-69.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/18/socket/"/>
+
+
+
+
+
+  <title>Tomcat Socket编程 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-search">
+          <a href="/search" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-search"></i> <br />
+            
+            搜索
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/18/socket/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tomcat Socket编程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-18T09:33:00+08:00">
+                2017-06-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">Tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="web服务器解释"><a href="#web服务器解释" class="headerlink" title="web服务器解释"></a>web服务器解释</h1><p>在网络环境下可以向发出请求的浏览器提供文档的程序<br>浏览器和Web服务器的一次交互过程分四步：连接、请求、响应、关闭。<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket  = <span class="keyword">new</span> ServerSocket(<span class="number">8080</span>, <span class="number">1</span>,  </span><br><span class="line">        InetAddress.getByName(“localhost”));  </span><br><span class="line">Socket socket = <span class="keyword">null</span>;  </span><br><span class="line">InputStream is = <span class="keyword">null</span>;  </span><br><span class="line">OutputStream os = <span class="keyword">null</span>;  </span><br><span class="line"><span class="keyword">try</span> &#123;  </span><br><span class="line">    socket = serverSocket.accept();<span class="comment">//1.监听到客户端的连接  </span></span><br><span class="line">    is = socket.getInputStream();  </span><br><span class="line">    os = socket.getOutputStream();  </span><br><span class="line">    Request request = Util.getRequest(is);<span class="comment">//2.从输入流中读取数据，并根据Http协议转换成请求  </span></span><br><span class="line">    Response response = Util.service(request);<span class="comment">//服务器内部根据请求信息给出响应信息  </span></span><br><span class="line">    os.writeResponse(response);<span class="comment">//3.将响应信息写到输出流  </span></span><br><span class="line">&#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">    e.printStackTrace();  </span><br><span class="line">&#125; <span class="keyword">finally</span> &#123;<span class="comment">//4.关闭输入输出流及连接  </span></span><br><span class="line">    <span class="keyword">if</span> (is != <span class="keyword">null</span>) &#123;  </span><br><span class="line">        is.close();  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">if</span> (os != <span class="keyword">null</span>) &#123;  </span><br><span class="line">        os.close();  </span><br><span class="line">    &#125;  </span><br><span class="line">    socket.close();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<h1 id="http-bio-8080-Acceptor-0"><a href="#http-bio-8080-Acceptor-0" class="headerlink" title="http-bio-8080-Acceptor-0"></a>http-bio-8080-Acceptor-0</h1><h2 id="监听客户端连接"><a href="#监听客户端连接" class="headerlink" title="监听客户端连接"></a>监听客户端连接</h2><p>接收器线程，如前文开始截图里的http-bio-8080-Acceptor-0，这个线程的实现org.apache.tomcat.util.net.JIoEndpoint.Acceptor，源码如下：<br>socket = serverSocketFactory.acceptSocket(serverSocket);</p>
+<h2 id="processSocket处理这次接收到的Socket连接"><a href="#processSocket处理这次接收到的Socket连接" class="headerlink" title="processSocket处理这次接收到的Socket连接"></a>processSocket处理这次接收到的Socket连接</h2><p>监听客户端连接，监听到连接后（即浏览器向服务器发起一次请求）在第53行由processSocket方法来处理这次接收到的Socket连接。processSocket方法源码如下<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">boolean</span> <span class="title">processSocket</span><span class="params">(Socket socket)</span> </span>&#123;  </span><br><span class="line">    <span class="comment">// Process the request from this socket  </span></span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">        SocketWrapper&lt;Socket&gt; wrapper = <span class="keyword">new</span> SocketWrapper&lt;Socket&gt;(socket);  </span><br><span class="line">        wrapper.setKeepAliveLeft(getMaxKeepAliveRequests());  </span><br><span class="line">        <span class="comment">// During shutdown, executor may be null - avoid NPE  </span></span><br><span class="line">        <span class="keyword">if</span> (!running) &#123;  </span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;  </span><br><span class="line">        &#125;  </span><br><span class="line">        getExecutor().execute(<span class="keyword">new</span> SocketProcessor(wrapper));  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (RejectedExecutionException x) &#123;  </span><br><span class="line">        log.warn(<span class="string">"Socket processing request was rejected for:"</span>+socket,x);  </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;  </span><br><span class="line">        ExceptionUtils.handleThrowable(t);  </span><br><span class="line">        <span class="comment">// This means we got an OOM or similar creating a thread, or that  </span></span><br><span class="line">        <span class="comment">// the pool and its queue are full  </span></span><br><span class="line">        log.error(sm.getString(<span class="string">"endpoint.process.fail"</span>), t);  </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="接收到一次Socket连接后另启一个线程处理该连接SocketProcessor"><a href="#接收到一次Socket连接后另启一个线程处理该连接SocketProcessor" class="headerlink" title="接收到一次Socket连接后另启一个线程处理该连接SocketProcessor"></a>接收到一次Socket连接后另启一个线程处理该连接SocketProcessor</h2><p>该方法中先把Socket包装成SocketWrapper，用以内部处理。重点是第10行：getExecutor().execute(new SocketProcessor(wrapper))。如果按照上面伪代码中的处理方式，在有并发请求的情况下，一个请求没有处理完成，服务器将无法立即响应另一个请求。这里做了一下改进，即在接收到一次Socket连接后另启一个线程处理该连接，使当前线程不阻塞。<br>下面跟着SocketProcessor这个线程来看看，一次Socket连接是如何在Tomcat7中被转成内部的Request的。看下该线程的run方法：</p>
+<h2 id="Http11ConnectionHandler对象的process方法"><a href="#Http11ConnectionHandler对象的process方法" class="headerlink" title="Http11ConnectionHandler对象的process方法"></a>Http11ConnectionHandler对象的process方法</h2><p>调用handler对象的process方法，这里handler对象实际上是Http11ConnectionHandler类的实例，该对象的初始化过程是在org.apache.coyote.http11.Http11Protocol对象的构造方法中：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Http11Protocol</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    endpoint = <span class="keyword">new</span> JIoEndpoint();  </span><br><span class="line">    cHandler = <span class="keyword">new</span> Http11ConnectionHandler(<span class="keyword">this</span>);  </span><br><span class="line">    ((JIoEndpoint) endpoint).setHandler(cHandler);  </span><br><span class="line">    setSoLinger(Constants.DEFAULT_CONNECTION_LINGER);  </span><br><span class="line">    setSoTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);  </span><br><span class="line">    setTcpNoDelay(Constants.DEFAULT_TCP_NO_DELAY);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>所以需要到org.apache.coyote.http11.Http11Protocol类的静态内部类Http11ConnectionHandler中找到process方法的定义，但当前定义里面没有，这个方法是在其父类org.apache.coyote.AbstractProtocol.AbstractConnectionHandler中定义的：</p>
+<h2 id="Http11Processor的process方法处理socket"><a href="#Http11Processor的process方法处理socket" class="headerlink" title="Http11Processor的process方法处理socket"></a>Http11Processor的process方法处理socket</h2><p>调用processor的process方法处理socket。而processor对象在第18行通过createProcessor方法创建出来的，createProcessor方法在当前类里面是抽象方法，默认情况下调用的具体实现类在上面提到的Http11ConnectionHandler类中：<br>此时的processor对象是Http11Processor类的实例，再看上一段提到的processor.process方法，最终会执行到Http11Processor类（因为该类中没有定义process方法）的父类org.apache.coyote.http11.AbstractHttp11Processor中的process方法。<br>为了方便理解，下面的时序图列出从Acceptor线程的run方法到AbstractHttp11Processor类的process方法的关键方法调用过程：</p>
+<p><img src="/images/pasted-69.png" alt="upload successful"><br>从这个方法中可以清晰的看出解析请求的过程：第7到10行从Socket中获取输入输出流，第32到97行解析请求行和请求头，第99到115行校验和解析请求头中的属性，第125到160行调用适配器的service方法，第172行请求处理结束。<br>上面就是根据Http协议解析请求的总体流程。要理解上面提到的请求行、请求头等术语，需要熟悉Http协议，这里简单介绍下Http协议中的标准请求信息数据的格式：<br>AbstractHttp11Processor类的process代码中的第36行，会调用抽象方法getInputBuffer()，当前该抽象方法的具体实现在子类org.apache.coyote.http11.Http11Processor中，该方法返回的是该类的实例变量inputBuffer：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> AbstractInputBuffer&lt;Socket&gt; <span class="title">getInputBuffer</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    <span class="keyword">return</span> inputBuffer;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>该实例变量在Http11Processor的构造方法中会被初始化：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Http11Processor</span><span class="params">(<span class="keyword">int</span> headerBufferSize, JIoEndpoint endpoint,  </span></span></span><br><span class="line"><span class="function"><span class="params">        <span class="keyword">int</span> maxTrailerSize)</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">super</span>(endpoint);  </span><br><span class="line">      </span><br><span class="line">    inputBuffer = <span class="keyword">new</span> InternalInputBuffer(request, headerBufferSize);  </span><br><span class="line">    request.setInputBuffer(inputBuffer);  </span><br><span class="line">  </span><br><span class="line">    outputBuffer = <span class="keyword">new</span> InternalOutputBuffer(response, headerBufferSize);  </span><br><span class="line">    response.setOutputBuffer(outputBuffer);  </span><br><span class="line">  </span><br><span class="line">    initializeFilters(maxTrailerSize);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="InputBuffer-parseRequestLine-调用"><a href="#InputBuffer-parseRequestLine-调用" class="headerlink" title="InputBuffer().parseRequestLine()调用"></a>InputBuffer().parseRequestLine()调用</h2><p>解析字节数据到request变量中<br>所以AbstractHttp11Processor类的process方法的36行getInputBuffer().parseRequestLine()将会调用org.apache.coyote.http11.InternalInputBuffer类中的parseRequestLine方法：<br>在这里可以看到从输入流中读取数据到缓冲区buf。按照上面列出的请求行数据格式，从字符流中将会按顺序得到请求的类型（method）、请求的URI和Http版本。具体实现流程如下：<br>在org.apache.coyote.http11.InternalInputBuffer类中的parseRequestLine方法，第34到57行根据请求头协议的格式，从中取出表示请求方法的字节数据并设置到内置实例变量request。第60到72行解析method和uri之间的空格字节SP，第83到119行读取表示请求的URI的字节数据并放到request变量中。第122到133行解析uri和http协议版本之间的空格字节SP，第144到第168行读取表示请求的Http协议版本的字节数据并放到request变量中。<br>以上是根据Http协议解析请求行（request line）的代码实现部分，解析请求头的部分见InternalInputBuffer类的parseHeader方法，不再赘述。</p>
+<h2 id="原始的字符流数据转换Tomcat内置对象Request"><a href="#原始的字符流数据转换Tomcat内置对象Request" class="headerlink" title="原始的字符流数据转换Tomcat内置对象Request"></a>原始的字符流数据转换Tomcat内置对象Request</h2><p>至此可以看到在Tomcat中如何从一次Socket连接中取出请求的数据，将这些原始的字符流数据转换成初步可以理解的Tomcat内置对象org.apache.coyote.Request的。下一篇文章将会看到已经转换成内部变量的请求对象在Tomcat容器中的流转经过，如何一步一步将请求送到最终要执行的某个web应用中的某个servlet对象的service方法中的。</p>
+<h2 id="CoyoteAdapter类的service方法"><a href="#CoyoteAdapter类的service方法" class="headerlink" title="CoyoteAdapter类的service方法"></a>CoyoteAdapter类的service方法</h2><p>前一篇文章分析到了org.apache.coyote.http11.AbstractHttp11Processor类process方法，以解析请求头的getInputBuffer().parseRequestLine方法调用为例，看到如何从Socket的IO流中取出字节    流数据，根据Http协议将字节流组装到Tomcat内部的org.apache.coyote.Request对象的相关属性中。<br>将会解释构造好的Tomcat的内部请求对象从Connector到Engine到Host到Context最后到Servlet的过程。<br>请求对象在容器中的流转在第127行：<br>adapter.service(request, response);<br>这里的adapter对象是在Http11Processor对象创建的时候设置的，见org.apache.coyote.http11.Http11Protocol.Http11ConnectionHandler类的createProcessor方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Http11Processor <span class="title">createProcessor</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">    Http11Processor processor = <span class="keyword">new</span> Http11Processor(  </span><br><span class="line">            proto.getMaxHttpHeaderSize(), (JIoEndpoint)proto.endpoint,  </span><br><span class="line">            proto.getMaxTrailerSize());  </span><br><span class="line">    processor.setAdapter(proto.adapter);  </span><br><span class="line">    processor.setMaxKeepAliveRequests(proto.getMaxKeepAliveRequests());  </span><br><span class="line">    processor.setKeepAliveTimeout(proto.getKeepAliveTimeout());  </span><br><span class="line">    processor.setConnectionUploadTimeout(  </span><br><span class="line">            proto.getConnectionUploadTimeout());  </span><br><span class="line">    processor.setDisableUploadTimeout(proto.getDisableUploadTimeout());  </span><br><span class="line">    processor.setCompressionMinSize(proto.getCompressionMinSize());  </span><br><span class="line">    processor.setCompression(proto.getCompression());  </span><br><span class="line">    processor.setNoCompressionUserAgents(proto.getNoCompressionUserAgents());  </span><br><span class="line">    processor.setCompressableMimeTypes(proto.getCompressableMimeTypes());  </span><br><span class="line">    processor.setRestrictedUserAgents(proto.getRestrictedUserAgents());  </span><br><span class="line">    processor.setSocketBuffer(proto.getSocketBuffer());  </span><br><span class="line">    processor.setMaxSavePostSize(proto.getMaxSavePostSize());  </span><br><span class="line">    processor.setServer(proto.getServer());  </span><br><span class="line">    processor.setDisableKeepAlivePercentage(  </span><br><span class="line">            proto.getDisableKeepAlivePercentage());  </span><br><span class="line">    register(processor);  </span><br><span class="line">    <span class="keyword">return</span> processor;  </span><br><span class="line">&#125;  </span><br><span class="line">···</span><br><span class="line">可以看到adapter对象设置的是org.apache.coyote.http11.Http11Protocol的adapter变量，而该变量是在Connector类的initInternal方法中设值的：</span><br><span class="line">```java</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">super</span>.initInternal();  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Initialize adapter  </span></span><br><span class="line">    adapter = <span class="keyword">new</span> CoyoteAdapter(<span class="keyword">this</span>);  </span><br><span class="line">    protocolHandler.setAdapter(adapter);  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Make sure parseBodyMethodsSet has a default  </span></span><br><span class="line">    <span class="keyword">if</span>( <span class="keyword">null</span> == parseBodyMethodsSet ) &#123;  </span><br><span class="line">        setParseBodyMethods(getParseBodyMethods());  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (protocolHandler.isAprRequired() &amp;&amp;  </span><br><span class="line">            !AprLifecycleListener.isAprAvailable()) &#123;  </span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> LifecycleException(  </span><br><span class="line">                sm.getString(<span class="string">"coyoteConnector.protocolHandlerNoApr"</span>,  </span><br><span class="line">                        getProtocolHandlerClassName()));  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">        protocolHandler.init();  </span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;  </span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> LifecycleException  </span><br><span class="line">            (sm.getString  </span><br><span class="line">             (<span class="string">"coyoteConnector.protocolHandlerInitializationFailed"</span>), e);  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Initialize mapper listener  </span></span><br><span class="line">    mapperListener.init();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第6、7行就是初始化adapter对象并设值到Http11Protocol对象中的。</p>
+<p>所以上面看到的adapter.service(request, response)方法实际执行的是org.apache.catalina.connector.CoyoteAdapter类的service方法： </p>
+<h2 id="org-apache-coyote-Request对象被转成了org-apache-catalina-connector-Request对象"><a href="#org-apache-coyote-Request对象被转成了org-apache-catalina-connector-Request对象" class="headerlink" title="org.apache.coyote.Request对象被转成了org.apache.catalina.connector.Request对象"></a>org.apache.coyote.Request对象被转成了org.apache.catalina.connector.Request对象</h2><p>这段代码中可以看到入参org.apache.coyote.Request对象被转成了org.apache.catalina.connector.Request对象，后一类型的对象才是在Tomcat容器流转时真正传递的对象。重点关注第42行和第47行。<br>在第42行调用了postParseRequest方法：这段代码的主要作用是给org.apache.catalina.connector.Request对象设值，其中第113到117行：给该方法的入参mappingData的几个实例变量设置值，比如mappingData.host、mappingData.contextPath、mappingData.contexts、mappingData.wrapper，</p>
+<p>在Service内只有一个Engine，但可能有多个Connector，在Engine内部Engine和Host，Host和Context，Context和Wrapper都是一对多的关系。但浏览器发出一次请求连接并不需要也不可能让部署在Tomcat中的所有Web应用的所有Servlet类都执行一遍，本文所说的Map机制就是为了Connector在接收到一次Socket连接时转化成请求后，能够找到Engine下具体哪个Host、哪个Context、哪个Wrapper来执行这个请求。下一篇文章会看到容器是如果一步一步让请求在与本次请求相关的组件中流转的。</p>
+<h1 id="Tomcat7中的管道和阀的概念和实现-pipeline"><a href="#Tomcat7中的管道和阀的概念和实现-pipeline" class="headerlink" title="Tomcat7中的管道和阀的概念和实现 pipeline"></a>Tomcat7中的管道和阀的概念和实现 pipeline</h1><p>在Connector接收到一次连接并转化成请求（Request）后，会将请求传递到Engine的管道（Pipeline）的阀（ValveA）中。请求在Engine的管道中最终会传递到Engine Valve这个阀中。接着请求会从Engine Valve传递到一个Host的管道中，在该管道中最后传递到Host Valve这个阀里。接着从Host Valve传递到一个Context的管道中，在该管道中最后传递到Context Valve中。接下来请求会传递到Wrapper C内的管道所包含的阀Wrapper Valve中，在这里会经过一个过滤器链（Filter Chain），最终送到一个Servlet中。</p>
+<p>connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);<br>虽然只有一行，但调用了一堆方法，这里对这些方法逐个分析一下：<br>connector.getService()获取的是当前connector关联的Service组件，默认情况下获得的就是org.apache.catalina.core.StandardService的对象。其getContainer方法获得的是org.apache.catalina.core.StandardEngine的对象，<br>结合上一段代码可以看出Tomcat启动时，如果碰到server.xml里的Server/Service/Engine节点，先实例化一个org.apache.catalina.core.StandardEngine对象，在第11到13行，会以StandardEngine对象为入参调用org.apache.catalina.core.StandardService的setContainer方法。<br>     所以上面connector.getService().getContainer()方法得到的实际上是StandardEngine对象。紧接着的getPipeline方法返回的是StandardEngine类的父类org.apache.catalina.core.ContainerBase类的成员变量pipeline，看下该类中这个变量的声明代码：<br>protected Pipeline pipeline = new StandardPipeline(this);<br>所以connector.getService().getContainer().getPipeline()方法返回的是org.apache.catalina.core.StandardPipeline类的对象，该对象就是本文开头部分提到的管道（Pipeline）。</p>
+<p>所有的管道类都会实现org.apache.catalina.Pipeline这个接口，看下这个接口中定义的方法：</p>
+<p><img src="/images/pasted-70.png" alt="upload successful"></p>
+<p>Tomat7中一个管道包含多个阀（Valve），这些阀共分为两类，一类叫基础阀（通过getBasic、setBasic方法调用），一类是普通阀（通过addValve、removeValve调用）。管道都是包含在一个容器当中，所以API里还有getContainer和setContainer方法。一个管道一般有一个基础阀（通过setBasic添加），可以有0到多个普通阀（通过addValve添加）。</p>
+<p><img src="/images/pasted-71.png" alt="upload successful"><br>重点关注setNext、getNext、invoke这三个方法，通过setNext设置该阀的下一阀，通过getNext返回该阀的下一个阀的引用，invoke方法则执行该阀内部自定义的请求处理代码。</p>
+<p>Tomcat7里Pipeline的默认实现类是org.apache.catalina.core.StandardPipeline，其内部有三个成员变量：basic、first、container。</p>
+<h2 id="共同特点"><a href="#共同特点" class="headerlink" title="共同特点"></a>共同特点</h2><p>这里可以看出容器内的Engine、Host、Context、Wrapper容器组件的实现的共通点：<br>1.这些组件内部都有一个成员变量pipeline，因为它们都是从org.apache.catalina.core.ContainerBase类继承来的，pipeline就定义在这个类中。所以每一个容器内部都关联了一个管道。<br>2.都是在类的构造方法中设置管道内的基础阀。<br>3.所有的基础阀的实现最后都会调用其下一级容器（直接从请求中获取下一级容器对象的引用，在前一篇文章的分析中已经设置了与该请求相关的各级具体组件的引用）的getPipeline().getFirst().invoke()方法，直到Wrapper组件。因为Wrapper是对一个Servlet的包装，所以它的基础阀内部调用的过滤器链的doFilter方法和Servlet的service方法。<br>正是通过这种管道和阀的机制及上述的3点前提，使得请求可以从连接器内一步一步流转到具体Servlet的service方法中。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/14/jianjie/" rel="next" title="Tomcat简介">
+                <i class="fa fa-chevron-left"></i> Tomcat简介
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/20/consisthash.md/" rel="prev" title="一致性hash算法">
+                一致性hash算法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">77</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">21</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#web服务器解释"><span class="nav-number">1.</span> <span class="nav-text">web服务器解释</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#http-bio-8080-Acceptor-0"><span class="nav-number">2.</span> <span class="nav-text">http-bio-8080-Acceptor-0</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#监听客户端连接"><span class="nav-number">2.1.</span> <span class="nav-text">监听客户端连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#processSocket处理这次接收到的Socket连接"><span class="nav-number">2.2.</span> <span class="nav-text">processSocket处理这次接收到的Socket连接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接收到一次Socket连接后另启一个线程处理该连接SocketProcessor"><span class="nav-number">2.3.</span> <span class="nav-text">接收到一次Socket连接后另启一个线程处理该连接SocketProcessor</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Http11ConnectionHandler对象的process方法"><span class="nav-number">2.4.</span> <span class="nav-text">Http11ConnectionHandler对象的process方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Http11Processor的process方法处理socket"><span class="nav-number">2.5.</span> <span class="nav-text">Http11Processor的process方法处理socket</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InputBuffer-parseRequestLine-调用"><span class="nav-number">2.6.</span> <span class="nav-text">InputBuffer().parseRequestLine()调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原始的字符流数据转换Tomcat内置对象Request"><span class="nav-number">2.7.</span> <span class="nav-text">原始的字符流数据转换Tomcat内置对象Request</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CoyoteAdapter类的service方法"><span class="nav-number">2.8.</span> <span class="nav-text">CoyoteAdapter类的service方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#org-apache-coyote-Request对象被转成了org-apache-catalina-connector-Request对象"><span class="nav-number">2.9.</span> <span class="nav-text">org.apache.coyote.Request对象被转成了org.apache.catalina.connector.Request对象</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Tomcat7中的管道和阀的概念和实现-pipeline"><span class="nav-number">3.</span> <span class="nav-text">Tomcat7中的管道和阀的概念和实现 pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#共同特点"><span class="nav-number">3.1.</span> <span class="nav-text">共同特点</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
