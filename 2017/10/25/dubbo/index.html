@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Dubbo," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="节点角色说明Provider: 暴露服务的服务提供方。Consumer: 调用远程服务的服务消费方。Registry: 服务注册与发现的注册中心。Monitor: 统计服务的调用次数和调用时间的监控中心。Container: 服务运行容器。">
+<meta name="keywords" content="Dubbo">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dubbo介绍">
+<meta property="og:url" content="http://yoursite.com/2017/10/25/dubbo/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="节点角色说明Provider: 暴露服务的服务提供方。Consumer: 调用远程服务的服务消费方。Registry: 服务注册与发现的注册中心。Monitor: 统计服务的调用次数和调用时间的监控中心。Container: 服务运行容器。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-101.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-102.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-103.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-104.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-105.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-106.png">
+<meta property="og:updated_time" content="2018-02-23T07:23:23.164Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Dubbo介绍">
+<meta name="twitter:description" content="节点角色说明Provider: 暴露服务的服务提供方。Consumer: 调用远程服务的服务消费方。Registry: 服务注册与发现的注册中心。Monitor: 统计服务的调用次数和调用时间的监控中心。Container: 服务运行容器。">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-101.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/10/25/dubbo/"/>
+
+
+
+
+
+  <title>Dubbo介绍 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/10/25/dubbo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Dubbo介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-10-25T17:25:00+08:00">
+                2017-10-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Dubbo/" itemprop="url" rel="index">
+                    <span itemprop="name">Dubbo</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="节点角色说明"><a href="#节点角色说明" class="headerlink" title="节点角色说明"></a>节点角色说明</h1><p><img src="/images/pasted-101.png" alt="upload successful"><br>Provider: 暴露服务的服务提供方。<br>Consumer: 调用远程服务的服务消费方。<br>Registry: 服务注册与发现的注册中心。<br>Monitor: 统计服务的调用次数和调用时间的监控中心。<br>Container: 服务运行容器。<br><a id="more"></a></p>
+<h1 id="调用关系说明"><a href="#调用关系说明" class="headerlink" title="调用关系说明"></a>调用关系说明</h1><p>0.服务容器负责启动，加载，运行服务提供者。<br>1.服务提供者在启动时，向注册中心注册自己提供的服务。<br>2.服务消费者在启动时，向注册中心订阅自己所需的服务。<br>3.注册中心返回服务提供者地址列表给消费者，如果有变更，注册中心将基于长连接推送变更数据给消费者。<br>4.服务消费者，从提供者地址列表中，基于软负载均衡算法，选一台提供者进行调用，如果调用失败，再选另一台调用。<br>5.服务消费者和提供者，在内存中累计调用次数和调用时间，定时每分钟发送一次统计数据到监控中心。</p>
+<h1 id="协议介绍"><a href="#协议介绍" class="headerlink" title="协议介绍"></a>协议介绍</h1><h2 id="Dubbo协议"><a href="#Dubbo协议" class="headerlink" title="Dubbo协议"></a>Dubbo协议</h2><p>采用NIO复用单一长连接，并使用线程池并发处理请求，减少握手和加大并发效率，性能较好（推荐使用），在大文件传输时，单一连接会成为瓶颈。<br>Dubbo协议缺省每服务每提供者每消费者使用单一长连接，如果数据量较大，可以使用多个连接。示例： </p>
+<p><dubbo:protocol name="dubbo" connections="2"> </dubbo:protocol></p>
+<p><dubbo:service connections="”0”">或<dubbo:reference connections="”0”">表示该服务使用JVM共享长连接。(缺省) </dubbo:reference></dubbo:service></p>
+<p><dubbo:service connections="”1”">或<dubbo:reference connections="”1”">表示该服务使用独立长连接。 </dubbo:reference></dubbo:service></p>
+<p><dubbo:service connections="”2”">或<dubbo:reference connections="”2”">表示该服务使用独立两条长连接。<br>连接个数：单连接<br>连接方式：长连接<br>传输协议：TCP<br>传输方式：NIO异步传输<br>序列化：Hessian二进制序列化<br>适用范围：传入传出参数数据包较小（建议小于100K），消费者比提供者个数多，单一消费者无法压满提供者，尽量不要用dubbo协议传输大文件或超大字符串<br>适用场景：常规远程服务方法调用</dubbo:reference></dubbo:service></p>
+<h2 id="Rmi协议"><a href="#Rmi协议" class="headerlink" title="Rmi协议"></a>Rmi协议</h2><p>可与原生RMI互操作，基于TCP协议，偶尔会连接失败，需重建Stub。<br>如果服务接口继承了java.rmi.Remote接口，可以和原生RMI互操作，即：提供者用Dubbo的RMI协议暴露服务，消费者直接用标准RMI接口调用，或者提供方用标准RMI暴露服务，消费方用Dubbo的RMI协议调用。<br>如果服务接口没有继承java.rmi.Remote接口，缺省Dubbo将自动生成一个<br>com.xxx.XxxService$Remote的接口，并继承java.rmi.Remote接口，并以此接口暴露服务，但如果设置了<dubbo:protocol name="rmi" codec="spring">，将不生成$Remote接口，而使用Spring的RmiInvocationHandler接口暴露服务，和Spring兼容。<br>连接个数：多连接<br>连接方式：短连接<br>传输协议：TCP<br>传输方式：同步传输<br>序列化：Java标准二进制序列化<br>适用范围：传入传出参数数据包大小混合，消费者与提供者个数差不多，可传文件<br>适用场景：常规远程服务方法调用，与原生RMI服务互操作</dubbo:protocol></p>
+<h2 id="Hessian协议"><a href="#Hessian协议" class="headerlink" title="Hessian协议"></a>Hessian协议</h2><p>可与原生Hessian互操作，基于HTTP协议，需hessian.jar支持，http短连接的开销大。<br>连接个数：多连接<br>连接方式：短连接<br>传输协议：HTTP<br>传输方式：同步传输<br>序列化：Hessian二进制序列化<br>适用范围：传入传出参数数据包较大，提供者比消费者个数多，提供者压力较大，可传文件<br>适用场景：页面传输，文件传输，或与原生hessian服务互操作</p>
+<h1 id="不同服务不同协议配置"><a href="#不同服务不同协议配置" class="headerlink" title="不同服务不同协议配置"></a>不同服务不同协议配置</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 多协议配置 --&gt; </span><br><span class="line">&lt;dubbo:protocol name=<span class="string">"dubbo"</span> port=<span class="string">"20880"</span> /&gt; &lt;dubbo:protocol name=<span class="string">"rmi"</span> port=<span class="string">"1099"</span> /&gt; &lt;!-- 使用dubbo协议暴露服务 --&gt; &lt;dubbo:service <span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.ailk.uchannel.service.interfaces.HelloService"</span> version=<span class="string">"1.0.0"</span> ref=<span class="string">"helloService"</span> protocol=<span class="string">"dubbo"</span> /&gt; </span><br><span class="line">&lt;!-- 使用rmi协议暴露服务 --&gt; &lt;dubbo:service <span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.ailk.uchannel.service.interfaces.DemoService"</span> version=<span class="string">"1.0.0"</span> ref=<span class="string">"demoService"</span> protocol=<span class="string">"rmi"</span> /&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="多协议暴露服务"><a href="#多协议暴露服务" class="headerlink" title="多协议暴露服务"></a>多协议暴露服务</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;!-- 多协议配置 --&gt; </span><br><span class="line">&lt;dubbo:protocol name=<span class="string">"dubbo"</span> port=<span class="string">"20880"</span> /&gt; &lt;dubbo:protocol name=<span class="string">"hessian"</span> port=<span class="string">"8080"</span> /&gt; &lt;!-- 使用多个协议暴露服务 --&gt; &lt;dubbo:service </span><br><span class="line">id=<span class="string">"helloService"</span> <span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.ailk.uchannel.service.interfaces.HelloService"</span> version=<span class="string">"1.0.0"</span> </span><br><span class="line">protocol=<span class="string">"dubbo,hessian"</span> /&gt;</span><br></pre></td></tr></table></figure>
+<h1 id="容错模式"><a href="#容错模式" class="headerlink" title="容错模式"></a>容错模式</h1><h2 id="Failover-Cluster"><a href="#Failover-Cluster" class="headerlink" title="Failover Cluster"></a>Failover Cluster</h2><p>失败自动切换，当出现失败，重试其它服务器。(缺省)<br>通常用于读操作，但重试会带来更长延迟。<br>可通过retries=”2”来设置重试次数(不含第一次)。 </p>
+<h2 id="Failfast-Cluster"><a href="#Failfast-Cluster" class="headerlink" title="Failfast Cluster"></a>Failfast Cluster</h2><p>快速失败，只发起一次调用，失败立即报错。<br>通常用于非幂等性的写操作，比如新增记录。 </p>
+<h2 id="Failsafe-Cluster"><a href="#Failsafe-Cluster" class="headerlink" title="Failsafe Cluster"></a>Failsafe Cluster</h2><p>失败安全，出现异常时，直接忽略。<br>通常用于写入审计日志等操作。 </p>
+<h2 id="Failback-Cluster"><a href="#Failback-Cluster" class="headerlink" title="## Failback Cluster"></a>## Failback Cluster</h2><p> 失败自动恢复，后台记录失败请求，定时重发。<br> 通常用于消息通知操作。 </p>
+<h2 id="Forking-Cluster"><a href="#Forking-Cluster" class="headerlink" title="Forking Cluster"></a>Forking Cluster</h2><p> 并行调用多个服务器，只要一个成功即返回。<br> 通常用于实时性要求较高的读操作，但需要浪费更多服务资源。  可通过forks=”2”来设置最大并行数。<br>Broadcast Cluster<br> 广播调用所有提供者，逐个调用，任意一台报错则报错。(2.1.0开始支持)  通常用于通知所有提供者更新缓存或日志等本地资源信息。</p>
+<h1 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a>负载均衡</h1><h2 id="Random-LoadBalance"><a href="#Random-LoadBalance" class="headerlink" title="Random LoadBalance"></a>Random LoadBalance</h2><p>随机，按权重设置随机概率。<br>在一个截面上碰撞的概率高，但调用量越大分布越均匀，而且按概率使用权重后也比较均匀，有利于动态调整提供者权重。 </p>
+<h2 id="RoundRobin-LoadBalance"><a href="#RoundRobin-LoadBalance" class="headerlink" title="RoundRobin LoadBalance"></a>RoundRobin LoadBalance</h2><p>轮循，按公约后的权重设置轮循比率。<br>存在慢的提供者累积请求问题，比如：第二台机器很慢，但没挂，当请求调到第二台时就卡在那，久而久之，所有请求都卡在调到第二台上。 </p>
+<h2 id="LeastActive-LoadBalance"><a href="#LeastActive-LoadBalance" class="headerlink" title="LeastActive LoadBalance"></a>LeastActive LoadBalance</h2><p>最少活跃调用数，相同活跃数的随机，活跃数指调用前后计数差。<br>使慢的提供者收到更少请求，因为越慢的提供者的调用前后计数差会越大。 </p>
+<h2 id="ConsistentHash-LoadBalance"><a href="#ConsistentHash-LoadBalance" class="headerlink" title="ConsistentHash LoadBalance"></a>ConsistentHash LoadBalance</h2><p>一致性Hash，相同参数的请求总是发到同一提供者。<br>当某一台提供者挂时，原本发往该提供者的请求，基于虚拟节点，平摊到其它提供者，不会引起剧烈变动。<br> 算法参见：<a href="http://en.wikipedia.org/wiki/Consistent_hashing。" target="_blank" rel="noopener">http://en.wikipedia.org/wiki/Consistent_hashing。</a><br> 缺省只对第一个参数Hash，如果要修改，请配置<dubbo:parameter key="hash.arguments" value="0,1"><br> 缺省用160份虚拟节点，如果要修改，请配置<dubbo:parameter key="hash.nodes" value="320"></dubbo:parameter></dubbo:parameter></p>
+<h1 id="事件通知"><a href="#事件通知" class="headerlink" title="事件通知"></a>事件通知</h1><p>在调用之前，调用之后，出现异常时，会触发oninvoke, onreturn, onthrow三个事件，可以配置当事件发生时，通知哪个类的哪个方法。<br>示例：<br>注意,callback与async功能正交分解：async=true，表示结果是否马上返回，onreturn 表示是否需要回调。<br>组合情况：(async=false 默认) </p>
+<p>异步回调模式：async=true onreturn=”xxx”<br>同步回调模式：async=false onreturn=”xxx”<br>异步无回调 ：async=true<br>同步无回调 ：async=false</p>
+<h1 id="分层架构"><a href="#分层架构" class="headerlink" title="分层架构"></a>分层架构</h1><p><img src="/images/pasted-102.png" alt="upload successful"><br>Dubbo框架设计一共划分了10个层，而最上面的Service层是留给实际想要使用Dubbo开发分布式服务的开发者实现业务逻辑的接口层。图中左边淡蓝背景的为服务消费方使用的接口，右边淡绿色背景的为服务提供方使用的接口， 位于中轴线上的为双方都用到的接口。</p>
+<h2 id="服务接口层（Service）"><a href="#服务接口层（Service）" class="headerlink" title="服务接口层（Service）"></a>服务接口层（Service）</h2><p>该层是与实际业务逻辑相关的，根据服务提供方和服务消费方的业务设计对应的接口和实现。</p>
+<h2 id="配置层（Config）"><a href="#配置层（Config）" class="headerlink" title="配置层（Config）"></a>配置层（Config）</h2><p>对外配置接口，以ServiceConfig和ReferenceConfig为中心，可以直接new配置类，也可以通过spring解析配置生成配置类。<br>服务代理层（Proxy）：服务接口透明代理，生成服务的客户端Stub和服务器端Skeleton，以ServiceProxy为中心，扩展接口为ProxyFactory。</p>
+<h2 id="服务注册层（Registry）"><a href="#服务注册层（Registry）" class="headerlink" title="服务注册层（Registry）"></a>服务注册层（Registry）</h2><p>封装服务地址的注册与发现，以服务URL为中心，扩展接口为RegistryFactory、Registry和RegistryService。可能没有服务注册中心，此时服务提供方直接暴露服务。</p>
+<h2 id="集群层（Cluster）"><a href="#集群层（Cluster）" class="headerlink" title="集群层（Cluster）"></a>集群层（Cluster）</h2><p>封装多个提供者的路由及负载均衡，并桥接注册中心，以Invoker为中心，扩展接口为Cluster、Directory、Router和LoadBalance。将多个服务提供方组合为一个服务提供方，实现对服务消费方来透明，只需要与一个服务提供方进行交互。</p>
+<h2 id="监控层（Monitor）"><a href="#监控层（Monitor）" class="headerlink" title="监控层（Monitor）"></a>监控层（Monitor）</h2><p>RPC调用次数和调用时间监控，以Statistics为中心，扩展接口为MonitorFactory、Monitor和MonitorService。</p>
+<h2 id="远程调用层（Protocol）"><a href="#远程调用层（Protocol）" class="headerlink" title="远程调用层（Protocol）"></a>远程调用层（Protocol）</h2><p>封将RPC调用，以Invocation和Result为中心，扩展接口为Protocol、Invoker和Exporter。Protocol是服务域，它是Invoker暴露和引用的主功能入口，它负责Invoker的生命周期管理。Invoker是实体域，它是Dubbo的核心模型，其它模型都向它靠扰，或转换成它，它代表一个可执行体，可向它发起invoke调用，它有可能是一个本地的实现，也可能是一个远程的实现，也可能一个集群实现。</p>
+<h2 id="信息交换层（Exchange）"><a href="#信息交换层（Exchange）" class="headerlink" title="信息交换层（Exchange）"></a>信息交换层（Exchange）</h2><p>封装请求响应模式，同步转异步，以Request和Response为中心，扩展接口为Exchanger、ExchangeChannel、ExchangeClient和ExchangeServer。</p>
+<h2 id="网络传输层（Transport）"><a href="#网络传输层（Transport）" class="headerlink" title="网络传输层（Transport）"></a>网络传输层（Transport）</h2><p>抽象mina和netty为统一接口，以Message为中心，扩展接口为Channel、Transporter、Client、Server和Codec。</p>
+<h2 id="数据序列化层（Serialize）"><a href="#数据序列化层（Serialize）" class="headerlink" title="数据序列化层（Serialize）"></a>数据序列化层（Serialize）</h2><p>可复用的一些工具，扩展接口为Serialization、 ObjectInput、ObjectOutput和ThreadPool。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>1、在RPC中，Protocol是核心层，也就是只要有Protocol + Invoker + Exporter就可以完成非透明的RPC调用，然后在Invoker的主过程上Filter拦截点。</p>
+<p>2、Consumer和Provider是抽象概念，只是想让看图者更直观的了解哪些类分属于客户端与服务器端，不用Client和Server的原因是Dubbo在很多场景下都使用Provider、Consumer、Registry、Monitor划分逻辑拓普节点，保持统一概念。</p>
+<p>3、Cluster是外围概念，所以Cluster的目的是将多个Invoker伪装成一个Invoker，这样其它人只要关注Protocol层Invoker即可，加上Cluster或者去掉Cluster对其它层都不会造成影响，因为只有一个提供者时，是不需要Cluster的。</p>
+<p>4、Proxy层封装了所有接口的透明化代理，而在其它层都以Invoker为中心，只有到了暴露给用户使用时，才用Proxy将Invoker转成接口，或将接口实现转成Invoker，也就是去掉Proxy层RPC是可以Run的，只是不那么透明，不那么看起来像调本地服务一样调远程服务。</p>
+<p>5、Remoting实现是Dubbo协议的实现，如果你选择RMI协议，整个Remoting都不会用上，Remoting内部再划为Transport传输层和Exchange信息交换层，Transport层只负责单向消息传输，是对Mina、Netty、Grizzly的抽象，它也可以扩展UDP传输，而Exchange层是在传输层之上封装了Request-Response语义。</p>
+<p>6、Registry和Monitor实际上不算一层，而是一个独立的节点，只是为了全局概览，用层的方式画在一起。</p>
+<p><img src="/images/pasted-103.png" alt="upload successful"></p>
+<h1 id="源码模块介绍"><a href="#源码模块介绍" class="headerlink" title="源码模块介绍"></a>源码模块介绍</h1><p>  ● dubbo-common 公共逻辑模块，包括Util类和通用模型。<br>  ● dubbo-remoting 远程通讯模块，相当于Dubbo协议的实现，如果RPC用RMI协议则不需要使用此包。<br>  ● dubbo-rpc 远程调用模块，抽象各种协议，以及动态代理，只包含一对一的调用，不关心集群的管理。<br>  ● dubbo-cluster 集群模块，将多个服务提供方伪装为一个提供方，包括：负载均衡、容错、路由等，集群的地址列表可以是静态配置的，也可以是由注册中心下发。<br>  ● dubbo-registry 注册中心模块，基于注册中心下发地址的集群方式，以及对各种注册中心的抽象。<br>  ● dubbo-monitor 监控模块，统计服务调用次数，调用时间的，调用链跟踪的服务。<br>  ● dubbo-config 配置模块，是Dubbo对外的API，用户通过Config使用Dubbo，隐藏Dubbo所有细节。<br>  ● dubbo-container 容器模块，是一个Standalone的容器，以简单的Main加载Spring启动，因为服务通常不需要Tomcat/JBoss等Web容器的特性，没必要用Web容器去加载服务。</p>
+<h1 id="服务提供者暴露一个服务的详细过程"><a href="#服务提供者暴露一个服务的详细过程" class="headerlink" title="服务提供者暴露一个服务的详细过程"></a>服务提供者暴露一个服务的详细过程</h1><p><img src="/images/pasted-104.png" alt="upload successful"><br>首先ServiceConfig类拿到对外提供服务的实际类ref(如：HelloWorldImpl),然后通过ProxyFactory类的getInvoker方法使用ref生成一个AbstractProxyInvoker实例，到这一步就完成具体服务到Invoker的转化。接下来就是Invoker转换到Exporter的过程。<br>Dubbo处理服务暴露的关键就在Invoker转换到Exporter的过程(如上图中的红色部分)，下面我们以Dubbo和RMI这两种典型协议的实现来进行说明：</p>
+<h1 id="服务消费者消费一个服务的详细过程"><a href="#服务消费者消费一个服务的详细过程" class="headerlink" title="服务消费者消费一个服务的详细过程"></a>服务消费者消费一个服务的详细过程</h1><p><img src="/images/pasted-105.png" alt="upload successful"><br>首先ReferenceConfig类的init方法调用Protocol的refer方法生成Invoker实例(如上图中的红色部分)，这是服务消费的关键。接下来把Invoker转换为客户端需要的接口(如：HelloWorld)。<br>关于每种协议如RMI/Dubbo/Web service等它们在调用refer方法生成Invoker实例的细节和上一章节所描述的类似。</p>
+<p>满眼都是Invoker<br>由于Invoker是Dubbo领域模型中非常重要的一个概念，很多设计思路都是向它靠拢。这就使得Invoker渗透在整个实现代码里，对于刚开始接触Dubbo的人，确实容易给搞混了。<br>下面我们用一个精简的图来说明最重要的两种Invoker：服务提供Invoker和服务消费Invoker：</p>
+<p><img src="/images/pasted-106.png" alt="upload successful"></p>
+<h1 id="服务消费者代码"><a href="#服务消费者代码" class="headerlink" title="服务消费者代码"></a>服务消费者代码</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoClientAction</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line"> <span class="keyword">private</span> DemoService demoService;</span><br><span class="line"> </span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setDemoService</span><span class="params">(DemoService demoService)</span> </span>&#123;</span><br><span class="line"> <span class="keyword">this</span>.demoService = demoService;</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">()</span> </span>&#123;</span><br><span class="line"> String hello = demoService.sayHello(<span class="string">"world"</span> + i);</span><br><span class="line"> &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面代码中的’DemoService’就是上图中服务消费端的proxy，用户代码通过这个proxy调用其对应的Invoker(DubboInvoker、 HessianRpcInvoker、 InjvmInvoker、 RmiInvoker、 WebServiceInvoker中的任何一个)，而该Invoker实现了真正的远程服务调用。</p>
+<h1 id="服务提供者代码"><a href="#服务提供者代码" class="headerlink" title="服务提供者代码"></a>服务提供者代码</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DemoServiceImpl</span> <span class="keyword">implements</span> <span class="title">DemoService</span> </span>&#123;</span><br><span class="line"> </span><br><span class="line"> <span class="function"><span class="keyword">public</span> String <span class="title">sayHello</span><span class="params">(String name)</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span><br><span class="line"> <span class="keyword">return</span> <span class="string">"Hello "</span> + name;</span><br><span class="line"> &#125;</span><br><span class="line"> </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面这个类会被封装成为一个AbstractProxyInvoker实例，并新生成一个<br>Exporter实例。这样当网络通讯层收到一个请求后，会找到对应的Exporter实例，并调用它所对应的AbstractProxyInvoker实例，从而真正调用了服务提供者的代码。<br>Dubbo里还有一些其他的Invoker类，但上面两种是最重要的。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Dubbo/" rel="tag"># Dubbo</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/10/11/insert/" rel="next" title="插入排序 希尔排序">
+                <i class="fa fa-chevron-left"></i> 插入排序 希尔排序
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/11/14/exchange/" rel="prev" title="冒泡排序与快速排序">
+                冒泡排序与快速排序 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">88</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/awangdev/LintCode" title="LintCode" target="_blank">LintCode</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#节点角色说明"><span class="nav-number">1.</span> <span class="nav-text">节点角色说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#调用关系说明"><span class="nav-number">2.</span> <span class="nav-text">调用关系说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#协议介绍"><span class="nav-number">3.</span> <span class="nav-text">协议介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Dubbo协议"><span class="nav-number">3.1.</span> <span class="nav-text">Dubbo协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rmi协议"><span class="nav-number">3.2.</span> <span class="nav-text">Rmi协议</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hessian协议"><span class="nav-number">3.3.</span> <span class="nav-text">Hessian协议</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#不同服务不同协议配置"><span class="nav-number">4.</span> <span class="nav-text">不同服务不同协议配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多协议暴露服务"><span class="nav-number">5.</span> <span class="nav-text">多协议暴露服务</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#容错模式"><span class="nav-number">6.</span> <span class="nav-text">容错模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Failover-Cluster"><span class="nav-number">6.1.</span> <span class="nav-text">Failover Cluster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Failfast-Cluster"><span class="nav-number">6.2.</span> <span class="nav-text">Failfast Cluster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Failsafe-Cluster"><span class="nav-number">6.3.</span> <span class="nav-text">Failsafe Cluster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Failback-Cluster"><span class="nav-number">6.4.</span> <span class="nav-text">## Failback Cluster</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Forking-Cluster"><span class="nav-number">6.5.</span> <span class="nav-text">Forking Cluster</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#负载均衡"><span class="nav-number">7.</span> <span class="nav-text">负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Random-LoadBalance"><span class="nav-number">7.1.</span> <span class="nav-text">Random LoadBalance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RoundRobin-LoadBalance"><span class="nav-number">7.2.</span> <span class="nav-text">RoundRobin LoadBalance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LeastActive-LoadBalance"><span class="nav-number">7.3.</span> <span class="nav-text">LeastActive LoadBalance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ConsistentHash-LoadBalance"><span class="nav-number">7.4.</span> <span class="nav-text">ConsistentHash LoadBalance</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事件通知"><span class="nav-number">8.</span> <span class="nav-text">事件通知</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#分层架构"><span class="nav-number">9.</span> <span class="nav-text">分层架构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#服务接口层（Service）"><span class="nav-number">9.1.</span> <span class="nav-text">服务接口层（Service）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置层（Config）"><span class="nav-number">9.2.</span> <span class="nav-text">配置层（Config）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务注册层（Registry）"><span class="nav-number">9.3.</span> <span class="nav-text">服务注册层（Registry）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#集群层（Cluster）"><span class="nav-number">9.4.</span> <span class="nav-text">集群层（Cluster）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监控层（Monitor）"><span class="nav-number">9.5.</span> <span class="nav-text">监控层（Monitor）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#远程调用层（Protocol）"><span class="nav-number">9.6.</span> <span class="nav-text">远程调用层（Protocol）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#信息交换层（Exchange）"><span class="nav-number">9.7.</span> <span class="nav-text">信息交换层（Exchange）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#网络传输层（Transport）"><span class="nav-number">9.8.</span> <span class="nav-text">网络传输层（Transport）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据序列化层（Serialize）"><span class="nav-number">9.9.</span> <span class="nav-text">数据序列化层（Serialize）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">9.10.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码模块介绍"><span class="nav-number">10.</span> <span class="nav-text">源码模块介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务提供者暴露一个服务的详细过程"><span class="nav-number">11.</span> <span class="nav-text">服务提供者暴露一个服务的详细过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务消费者消费一个服务的详细过程"><span class="nav-number">12.</span> <span class="nav-text">服务消费者消费一个服务的详细过程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务消费者代码"><span class="nav-number">13.</span> <span class="nav-text">服务消费者代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务提供者代码"><span class="nav-number">14.</span> <span class="nav-text">服务提供者代码</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

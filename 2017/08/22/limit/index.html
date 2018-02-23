@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="架构," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="一般开发高并发系统常见的限流：1、限制总并发数（比如数据库连接池、线程池）2、限制瞬时并发数（如nginx的limit_conn模块，用来限制瞬时并发连接数）3、限制时间窗口内的平均速率（如Guava的RateLimiter、nginx的limit_req模块，限制每秒的平均速率）4、其他还有如限制远程接口调用速率5、限制MQ的消费速率6、另外还可以根据网络连接数、网络流量、CPU或内存负载等来限">
+<meta name="keywords" content="架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="限流">
+<meta property="og:url" content="http://yoursite.com/2017/08/22/limit/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="一般开发高并发系统常见的限流：1、限制总并发数（比如数据库连接池、线程池）2、限制瞬时并发数（如nginx的limit_conn模块，用来限制瞬时并发连接数）3、限制时间窗口内的平均速率（如Guava的RateLimiter、nginx的limit_req模块，限制每秒的平均速率）4、其他还有如限制远程接口调用速率5、限制MQ的消费速率6、另外还可以根据网络连接数、网络流量、CPU或内存负载等来限">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/pasted-91.png">
+<meta property="og:image" content="http://yoursite.com/images/pasted-92.png">
+<meta property="og:updated_time" content="2018-02-23T07:03:16.603Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="限流">
+<meta name="twitter:description" content="一般开发高并发系统常见的限流：1、限制总并发数（比如数据库连接池、线程池）2、限制瞬时并发数（如nginx的limit_conn模块，用来限制瞬时并发连接数）3、限制时间窗口内的平均速率（如Guava的RateLimiter、nginx的limit_req模块，限制每秒的平均速率）4、其他还有如限制远程接口调用速率5、限制MQ的消费速率6、另外还可以根据网络连接数、网络流量、CPU或内存负载等来限">
+<meta name="twitter:image" content="http://yoursite.com/images/pasted-91.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/08/22/limit/"/>
+
+
+
+
+
+  <title>限流 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/22/limit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">限流</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-22T22:40:00+08:00">
+                2017-08-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/架构/" itemprop="url" rel="index">
+                    <span itemprop="name">架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一般开发高并发系统常见的限流："><a href="#一般开发高并发系统常见的限流：" class="headerlink" title="一般开发高并发系统常见的限流："></a>一般开发高并发系统常见的限流：</h1><p>1、限制总并发数（比如数据库连接池、线程池）<br>2、限制瞬时并发数（如nginx的limit_conn模块，用来限制瞬时并发连接数）<br>3、限制时间窗口内的平均速率（如Guava的RateLimiter、nginx的limit_req模块，限制每秒的平均速率）<br>4、其他还有如限制远程接口调用速率<br>5、限制MQ的消费速率<br>6、另外还可以根据网络连接数、网络流量、CPU或内存负载等来限流。</p>
+<a id="more"></a>
+<h1 id="限流算法"><a href="#限流算法" class="headerlink" title="限流算法"></a>限流算法</h1><p>常见的限流算法有：令牌桶、漏桶。计数器也可以进行粗暴限流实现。</p>
+<h2 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h2><p>令牌桶算法是一个存放固定容量令牌的桶，按照固定速率往桶里添加令牌。令牌桶算法的描述如下：<br>  ● 假设限制2r/s，则按照500毫秒的固定速率往桶中添加令牌；<br>  ● 桶中最多存放b个令牌，当桶满时，新添加的令牌被丢弃或拒绝；<br>  ● 当一个n个字节大小的数据包到达，将从桶中删除n个令牌，接着数据包被发送到网络上；<br>  ● 如果桶中的令牌不足n个，则不会删除令牌，且该数据包将被限流（要么丢弃，要么缓冲区等待）。</p>
+<p><img src="/images/pasted-91.png" alt="upload successful"></p>
+<h2 id="漏桶算法"><a href="#漏桶算法" class="headerlink" title="漏桶算法"></a>漏桶算法</h2><p>漏桶作为计量工具（The Leaky Bucket Algorithm as a Meter）时，可以用于流量整形（Traffic Shaping）和流量控制（TrafficPolicing），漏桶算法的描述如下：<br>  ● 一个固定容量的漏桶，按照常量固定速率流出水滴；<br>  ● 如果桶是空的，则不需流出水滴；<br>  ● 可以以任意速率流入水滴到漏桶；<br>  ● 如果流入水滴超出了桶的容量，则流入的水滴溢出了（被丢弃），而漏桶容量是不变的。</p>
+<p><img src="/images/pasted-92.png" alt="upload successful"></p>
+<h2 id="令牌桶和漏桶对比："><a href="#令牌桶和漏桶对比：" class="headerlink" title="令牌桶和漏桶对比："></a>令牌桶和漏桶对比：</h2><p>  ● 令牌桶是按照固定速率往桶中添加令牌，请求是否被处理需要看桶中令牌是否足够，当令牌数减为零时则拒绝新的请求；<br>  ● 漏桶则是按照常量固定速率流出请求，流入请求速率任意，当流入的请求数累积到漏桶容量时，则新流入的请求被拒绝；<br>  ● 令牌桶限制的是平均流入速率（允许突发请求，只要有令牌就可以处理，支持一次拿3个令牌，4个令牌），并允许一定程度突发流量；<br>  ● 漏桶限制的是常量流出速率（即流出速率是一个固定常量值，比如都是1的速率流出，而不能一次是1，下次又是2），从而平滑突发流入速率；<br>  ● 令牌桶允许一定程度的突发，而漏桶主要目的是平滑流入速率；<br>  ● 两个算法实现可以一样，但是方向是相反的，对于相同的参数得到的限流效果是一样的。</p>
+<p>另外有时候我们还使用计数器来进行限流，主要用来限制总并发数，比如数据库连接池、线程池、秒杀的并发数；只要全局总请求数或者一定时间段的总请求数设定的阀值则进行限流，是简单粗暴的总数量限流，而不是平均速率限流。</p>
+<h1 id="应用级限流"><a href="#应用级限流" class="headerlink" title="应用级限流"></a>应用级限流</h1><h2 id="限流总并发-连接-请求数-Tomcat"><a href="#限流总并发-连接-请求数-Tomcat" class="headerlink" title="限流总并发/连接/请求数 Tomcat"></a>限流总并发/连接/请求数 Tomcat</h2><p>对于一个应用系统来说一定会有极限并发/请求数，即总有一个TPS/QPS阀值，如果超了阀值则系统就会不响应用户请求或响应的非常慢，因此我们最好进行过载保护，防止大量请求涌入击垮系统。<br>如果你使用过Tomcat，其Connector 其中一种配置有如下几个参数：<br>acceptCount：如果Tomcat的线程都忙于响应，新来的连接会进入队列排队，如果超出排队大小，则拒绝连接；<br>maxConnections： 瞬时最大连接数，超出的会排队等待；<br>maxThreads：Tomcat能启动用来处理请求的最大线程数，如果请求处理量一直远远大于最大线程数则可能会僵死。<br>详细的配置请参考官方文档。另外如Mysql（如max_connections）、Redis（如tcp-backlog）都会有类似的限制连接数的配置。</p>
+<h2 id="限流总资源数-连接池线程池"><a href="#限流总资源数-连接池线程池" class="headerlink" title="限流总资源数 连接池线程池"></a>限流总资源数 连接池线程池</h2><p>如果有的资源是稀缺资源（如数据库连接、线程），而且可能有多个系统都会去使用它，那么需要限制应用；可以使用池化技术来限制总资源数：连接池、线程池。比如分配给每个应用的数据库连接是100，那么本应用最多可以使用100个资源，超出了可以等待或者抛异常。</p>
+<h2 id="AtomicLong-限流某个接口的总并发-请求数"><a href="#AtomicLong-限流某个接口的总并发-请求数" class="headerlink" title="AtomicLong 限流某个接口的总并发/请求数"></a>AtomicLong 限流某个接口的总并发/请求数</h2><p>如果接口可能会有突发访问情况，但又担心访问量太大造成崩溃，如抢购业务；这个时候就需要限制这个接口的总并发/请求数总请求数了；因为粒度比较细，可以为每个接口都设置相应的阀值。可以使用Java中的AtomicLong进行限流：<br>try {<br>    if(atomic.incrementAndGet() &gt; 限流数) {<br>        //拒绝请求<br>   }<br>    //处理请求<br>} finally {<br>    atomic.decrementAndGet();<br>}<br>适合对业务无损的服务或者需要过载保护的服务进行限流，如抢购业务，超出了大小要么让用户排队，要么告诉用户没货了，对用户来说是可以接受的。而一些开放平台也会限制用户调用某个接口的试用请求量，也可以用这种计数器方式实现。这种方式也是简单粗暴的限流，没有平滑处理，需要根据实际情况选择使用；</p>
+<h2 id="限流某个接口的时间窗请求数-Guava-CacheBuilder"><a href="#限流某个接口的时间窗请求数-Guava-CacheBuilder" class="headerlink" title="限流某个接口的时间窗请求数 Guava CacheBuilder"></a>限流某个接口的时间窗请求数 Guava CacheBuilder</h2><p>即一个时间窗口内的请求数，如想限制某个接口/服务每秒/每分钟/每天的请求数/调用量。如一些基础服务会被很多其他系统调用，比如商品详情页服务会调用基础商品服务调用，但是怕因为更新量比较大将基础服务打挂，这时我们要对每秒/每分钟的调用量进行限速；一种实现方式如下所示：<br>LoadingCache<long, atomiclong=""> counter =<br>        CacheBuilder.newBuilder()<br>                .expireAfterWrite(2, TimeUnit.SECONDS)<br>                .build(new CacheLoader<long, atomiclong="">() {<br>                    @Override<br>                    public AtomicLong load(Long seconds) throws Exception {<br>                        return new AtomicLong(0);<br>                    }<br>                });<br>long limit = 1000;<br>while(true) {<br>    //得到当前秒<br>    long currentSeconds = System.currentTimeMillis() / 1000;<br>    if(counter.get(currentSeconds).incrementAndGet() &gt; limit) {<br>        System.out.println(“限流了:” + currentSeconds);<br>        continue;<br>    }<br>    //业务处理<br>}<br> 我们使用Guava的Cache来存储计数器，过期时间设置为2秒（保证1秒内的计数器是有的），然后我们获取当前时间戳然后取秒数来作为KEY进行计数统计和限流，这种方式也是简单粗暴，刚才说的场景够用了。</long,></long,></p>
+<h2 id="平滑限流某个接口的请求数-Guava-RateLimiter"><a href="#平滑限流某个接口的请求数-Guava-RateLimiter" class="headerlink" title="平滑限流某个接口的请求数 Guava RateLimiter"></a>平滑限流某个接口的请求数 Guava RateLimiter</h2><p>之前的限流方式都不能很好地应对突发请求，即瞬间请求可能都被允许从而导致一些问题；因此在一些场景中需要对突发请求进行整形，整形为平均速率请求处理（比如5r/s，则每隔200毫秒处理一个请求，平滑了速率）。这个时候有两种算法满足我们的场景：令牌桶和漏桶算法。Guava框架提供了令牌桶算法实现，可直接拿来使用。<br>Guava RateLimiter提供了令牌桶算法实现：<br>平滑突发限流(SmoothBursty)<br>平滑预热限流(SmoothWarmingUp)</p>
+<p>SmoothBursty<br>RateLimiter limiter = RateLimiter.create(5);<br>System.out.println(limiter.acquire());<br>System.out.println(limiter.acquire());<br>System.out.println(limiter.acquire());<br>System.out.println(limiter.acquire());<br>System.out.println(limiter.acquire());<br>System.out.println(limiter.acquire());<br>   将得到类似如下的输出：<br>   0.0<br>   0.198239<br>   0.196083<br>   0.200609<br>   0.199599<br>   0.19961<br>1、RateLimiter.create(5) 表示桶容量为5且每秒新增5个令牌，即每隔200毫秒新增一个令牌；<br>2、limiter.acquire()表示消费一个令牌，如果当前桶中有足够令牌则成功（返回值为0），如果桶中没有令牌则暂停一段时间，比如发令牌间隔是200毫秒，则等待200毫秒后再去消费令牌（如上测试用例返回的为0.198239，差不多等待了200毫秒桶中才有令牌可用），这种实现将突发请求速率平均为了固定请求速率。</p>
+<p>因为SmoothBursty允许一定程度的突发，会有人担心如果允许这种突发，假设突然间来了很大的流量，那么系统很可能扛不住这种突发。因此需要一种平滑速率的限流工具，从而系统冷启动后慢慢的趋于平均固定速率（即刚开始速率小一些，然后慢慢趋于我们设置的固定速率）。Guava也提供了SmoothWarmingUp来实现这种需求，其可以认为是漏桶算法，但是在某些特殊场景又不太一样。</p>
+<p>SmoothWarmingUp创建方式<br>RateLimiter.create(doublepermitsPerSecond, long warmupPeriod, TimeUnit unit)<br>permitsPerSecond表示每秒新增的令牌数，warmupPeriod表示在从冷启动速率过渡到平均速率的时间间隔。</p>
+<p>示例如下：<br>RateLimiter limiter = RateLimiter.create(5, 1000, TimeUnit.MILLISECONDS);<br>for(int i = 1; i &lt; 5;i++) {<br>    System.out.println(limiter.acquire());<br>}<br>Thread.sleep(1000L);<br>for(int i = 1; i &lt; 5;i++) {<br>    System.out.println(limiter.acquire());<br>}<br>将得到类似如下的输出：<br>0.0<br>0.51767<br>0.357814<br>0.219992<br>0.199984<br>0.0<br>0.360826<br>0.220166<br>0.199723<br>0.199555<br>速率是梯形上升速率的，也就是说冷启动时会以一个比较大的速率慢慢到平均速率；然后趋于平均速率（梯形下降到平均速率）。可以通过调节warmupPeriod参数实现一开始就是平滑固定速率。</p>
+<p>到此应用级限流的一些方法就介绍完了。假设将应用部署到多台机器，应用级限流方式只是单应用内的请求限流，不能进行全局限流。因此我们需要分布式限流和接入层限流来解决这个问题。</p>
+<h2 id="分布式限流"><a href="#分布式限流" class="headerlink" title="分布式限流"></a>分布式限流</h2><p>分布式限流最关键的是要将限流服务做成原子化，而解决方案可以使使用redis+lua或者nginx+lua技术进行实现，通过这两种技术可以实现的高并发和高性能。<br>首先我们来使用redis+lua实现时间窗内某个接口的请求数限流，实现了该功能后可以改造为限流总并发/请求数和限制总资源数。Lua本身就是一种编程语言，也可以使用它实现复杂的令牌桶或漏桶算法。</p>
+<p>redis+lua实现中的lua脚本：<br>local key = KEYS[1] –限流KEY（一秒一个）<br>local limit = tonumber(ARGV[1]) –限流大小<br>local current = tonumber(redis.call(“INCRBY”, key, “1”)) –请求数+1<br>if current &gt; limit then –如果超出限流大小<br>    return 0<br>elseif current == 1 then –只有第一次访问需要设置2秒的过期时间<br>    redis.call(“expire”, key,”2”)<br>end<br>return 1<br>如上操作因是在一个lua脚本中，又因Redis是单线程模型，因此是线程安全的。如上方式有一个缺点就是当达到限流大小后还是会递增的，可以改造成如下方式实现：<br>local key = KEYS[1] –限流KEY（一秒一个）<br>local limit = tonumber(ARGV[1]) –限流大小<br>local current = tonumber(redis.call(‘get’, key) or “0”)<br>if current + 1 &gt; limit then –如果超出限流大小<br>    return 0<br>else –请求数+1，并设置2秒过期<br>    redis.call(“INCRBY”, key,”1”)<br>    redis.call(“expire”, key,”2”)<br>    return 1<br>end<br>如下是Java中判断是否需要限流的代码：<br>public static boolean acquire() throws Exception {<br>String luaScript = Files.toString(new File(“limit.lua”), Charset.defaultCharset());<br>Jedis jedis = new Jedis(“192.168.147.52”, 6379);<br>String key = “ip:” + Sysngtem.currentTimeMillis()/ 1000; //此处将当前时间戳取秒数<br>Stringlimit = “3”; //限流大小<br>return (Long)jedis.eval(luaScript,Lists.newArrayList(key), Lists.newArrayList(limit)) == 1;<br>}<br>因为Redis的限制（Lua中有写操作不能使用带随机性质的读操作，如TIME）不能在Redis Lua中使用TIME获取时间戳，因此只好从应用获取然后传入，在某些极端情况下（机器时钟不准的情况下），限流会存在一些小问题。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/架构/" rel="tag"># 架构</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/16/queue/" rel="next" title="队列">
+                <i class="fa fa-chevron-left"></i> 队列
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/25/linuxio/" rel="prev" title="Linux下的五种IO模型">
+                Linux下的五种IO模型 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">88</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/awangdev/LintCode" title="LintCode" target="_blank">LintCode</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一般开发高并发系统常见的限流："><span class="nav-number">1.</span> <span class="nav-text">一般开发高并发系统常见的限流：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#限流算法"><span class="nav-number">2.</span> <span class="nav-text">限流算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#令牌桶算法"><span class="nav-number">2.1.</span> <span class="nav-text">令牌桶算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#漏桶算法"><span class="nav-number">2.2.</span> <span class="nav-text">漏桶算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#令牌桶和漏桶对比："><span class="nav-number">2.3.</span> <span class="nav-text">令牌桶和漏桶对比：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用级限流"><span class="nav-number">3.</span> <span class="nav-text">应用级限流</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#限流总并发-连接-请求数-Tomcat"><span class="nav-number">3.1.</span> <span class="nav-text">限流总并发/连接/请求数 Tomcat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限流总资源数-连接池线程池"><span class="nav-number">3.2.</span> <span class="nav-text">限流总资源数 连接池线程池</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AtomicLong-限流某个接口的总并发-请求数"><span class="nav-number">3.3.</span> <span class="nav-text">AtomicLong 限流某个接口的总并发/请求数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限流某个接口的时间窗请求数-Guava-CacheBuilder"><span class="nav-number">3.4.</span> <span class="nav-text">限流某个接口的时间窗请求数 Guava CacheBuilder</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#平滑限流某个接口的请求数-Guava-RateLimiter"><span class="nav-number">3.5.</span> <span class="nav-text">平滑限流某个接口的请求数 Guava RateLimiter</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式限流"><span class="nav-number">3.6.</span> <span class="nav-text">分布式限流</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

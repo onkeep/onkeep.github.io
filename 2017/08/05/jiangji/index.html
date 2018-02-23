@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="架构," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="简介当访问量剧增、服务出现问题（如响应时间慢或不响应）或非核心服务影响到核心流程的性能时，仍然需要保证服务还是可用的，即使是有损服务。系统可以根据一些关键数据进行自动降级，也可以配置开关实现人工降级。降级的最终目的是保证核心服务可用，即使是有损的。而且有些服务是无法降级的">
+<meta name="keywords" content="架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="降级">
+<meta property="og:url" content="http://yoursite.com/2017/08/05/jiangji/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="简介当访问量剧增、服务出现问题（如响应时间慢或不响应）或非核心服务影响到核心流程的性能时，仍然需要保证服务还是可用的，即使是有损服务。系统可以根据一些关键数据进行自动降级，也可以配置开关实现人工降级。降级的最终目的是保证核心服务可用，即使是有损的。而且有些服务是无法降级的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-23T07:00:43.276Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="降级">
+<meta name="twitter:description" content="简介当访问量剧增、服务出现问题（如响应时间慢或不响应）或非核心服务影响到核心流程的性能时，仍然需要保证服务还是可用的，即使是有损服务。系统可以根据一些关键数据进行自动降级，也可以配置开关实现人工降级。降级的最终目的是保证核心服务可用，即使是有损的。而且有些服务是无法降级的">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/08/05/jiangji/"/>
+
+
+
+
+
+  <title>降级 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/08/05/jiangji/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">降级</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-05T09:39:00+08:00">
+                2017-08-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/架构/" itemprop="url" rel="index">
+                    <span itemprop="name">架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>当访问量剧增、服务出现问题（如响应时间慢或不响应）或非核心服务影响到核心流程的性能时，仍然需要保证服务还是可用的，即使是有损服务。系统可以根据一些关键数据进行自动降级，也可以配置开关实现人工降级。降级的最终目的是保证核心服务可用，即使是有损的。而且有些服务是无法降级的<br><a id="more"></a></p>
+<h1 id="降级预案"><a href="#降级预案" class="headerlink" title="降级预案"></a>降级预案</h1><p>在进行降级之前要对系统进行梳理，看看系统是不是可以丢卒保帅；从而梳理出哪些必须誓死保护，哪些可降级；比如可以参考日志级别设置预案：<br>一般：比如有些服务偶尔因为网络抖动或者服务正在上线而超时，可以自动降级；<br>警告：有些服务在一段时间内成功率有波动（如在95~100%之间），可以自动降级或人工降级，并发送告警；<br>错误：比如可用率低于90%，或者数据库连接池被打爆了，或者访问量突然猛增到系统能承受的最大阀值，此时可以根据情况自动降级或者人工降级；<br>严重错误：比如因为特殊原因数据错误了，此时需要紧急人工降级。</p>
+<p>页面降级：在大促或者某些特殊情况下，某些页面占用了一些稀缺服务资源，在紧急情况下可以对其整个降级，以达到丢卒保帅；<br>页面片段降级：比如商品详情页中的商家部分因为数据错误了，此时需要对其进行降级；<br>页面异步请求降级：比如商品详情页上有推荐信息/配送至等异步加载的请求，如果这些信息响应慢或者后端服务有问题，可以进行降级；<br>服务功能降级：比如渲染商品详情页时需要调用一些不太重要的服务：相关分类、热销榜等，而这些服务在异常情况下直接不获取，即降级即可；<br>读降级：比如多级缓存模式，如果后端服务有问题，可以降级为只读缓存，这种方式适用于对读一致性要求不高的场景；<br>写降级：比如秒杀抢购，我们可以只进行Cache的更新，然后异步同步扣减库存到DB，保证最终一致性即可，此时可以将DB降级为Cache。<br>爬虫降级：在大促活动时，可以将爬虫流量导向静态页或者返回空数据，从而保护后端稀缺资源。<br>自动开关降级<br>自动降级是根据系统负载、资源使用情况、SLA等指标进行降级。</p>
+<h1 id="超时降级"><a href="#超时降级" class="headerlink" title="超时降级"></a>超时降级</h1><p>当访问的数据库/http服务/远程调用响应慢或者长时间响应慢，且该服务不是核心服务的话可以在超时后自动降级；比如商品详情页上有推荐内容/评价，但是推荐内容/评价暂时不展示对用户购物流程不会产生很大的影响；对于这种服务是可以超时降级的。如果是调用别人的远程服务，和对方定义一个服务响应最大时间，如果超时了则自动降级。<br>统计失败次数降级<br>有时候依赖一些不稳定的API，比如调用外部机票服务，当失败调用次数达到一定阀值自动降级；然后通过异步线程去探测服务是否恢复了，则取消降级。</p>
+<h1 id="故障降级"><a href="#故障降级" class="headerlink" title="故障降级"></a>故障降级</h1><p>比如要调用的远程服务挂掉了（网络故障、DNS故障、http服务返回错误的状态码、rpc服务抛出异常），则可以直接降级。降级后的处理方案有：默认值（比如库存服务挂了，返回默认现货）、兜底数据（比如广告挂了，返回提前准备好的一些静态页面）、缓存（之前暂存的一些缓存数据）。</p>
+<h1 id="限流降级"><a href="#限流降级" class="headerlink" title="限流降级"></a>限流降级</h1><p>当我们去秒杀或者抢购一些限购商品时，此时可能会因为访问量太大而导致系统崩溃，此时开发者会使用限流来进行限制访问量，当达到限流阀值，后续请求会被降级；降级后的处理方案可以是：排队页面（将用户导流到排队页面等一会重试）、无货（直接告知用户没货了）、错误页（如活动太火爆了，稍后重试）。</p>
+<h1 id="人工开关降级"><a href="#人工开关降级" class="headerlink" title="人工开关降级"></a>人工开关降级</h1><p>在大促期间通过监控发现线上的一些服务存在问题，这个时候需要暂时将这些服务摘掉；还有有时候通过任务系统调用一些服务，但是服务依赖的数据库可能存在：网卡被打满了、挂掉了或者很多慢查询，此时需要暂停下任务系统让服务方进行处理；还有发现突然调用量太大，可能需要改变处理方式（比如同步转换为异步）；此时就可以使用开关来完成降级。开关可以存放到配置文件、存放到数据库、存放到Redis/ZooKeeper；如果不是存放在本地，可以定期同步开关数据（比如1秒同步一次）。然后通过判断某个KEY的值来决定是否降级。</p>
+<p>另外对于新开发的服务想上线进行灰度测试；但是不太确定该服务的逻辑是否正确，此时就需要设置开关，当新服务有问题可以通过开关切换回老服务。还有多机房服务，如果某个机房挂掉了，此时需要将一个机房的服务切到另一个机房，此时也可以通过开关完成切换。</p>
+<p>还有一些是因为功能问题需要暂时屏蔽掉某些功能，比如商品规格参数数据有问题，数据问题不能用回滚解决，此时需要开关控制降级。</p>
+<h1 id="读服务降级"><a href="#读服务降级" class="headerlink" title="读服务降级"></a>读服务降级</h1><p>对于读服务降级一般采用的策略有：暂时切换读（降级到读缓存、降级到走静态化）、暂时屏蔽读（屏蔽读入口、屏蔽某个读服务）。在《应用多级缓存模式支撑海量读服务》中曾经介绍过读服务，即接入层缓存–&gt;应用层本地缓存–&gt;分布式缓存–&gt;RPC服务/DB，我们会在接入层、应用层设置开关，当分布式缓存、RPC服务/DB有问题自动降级为不调用。当然这种情况适用于对读一致性要求不高的场景。<br>页面降级、页面片段降级、页面异步请求降级都是读服务降级，目的是丢卒保帅（比如因为这些服务也要使用核心资源、或者占了带宽影响到核心服务）或者因数据问题暂时屏蔽。<br>动态化降级为静态化：比如平时网站可以走动态化渲染商品详情页，但是到了大促来临之际可以将其切换为静态化来减少对核心资源的占用，而且可以提升性能；其他还有如列表页、首页、频道页都可以这么玩；可以通过一个程序定期的推送静态页到缓存或者生成到磁盘，出问题时直接切过去；<br>静态化降级为动态化：比如当使用静态化来实现商品详情页架构时，平时使用静态化来提供服务，但是因为特殊原因静态化页面有问题了，需要暂时切换回动态化来保证服务正确性。<br>以上都保证出问题了有预案，用户还是可以使用网站，不影响用户购物。</p>
+<h1 id="写服务降级"><a href="#写服务降级" class="headerlink" title="写服务降级"></a>写服务降级</h1><p>写服务在大多数场景下是不可降级的，不过可以通过一些迂回战术来解决问题。比如将同步操作转换为异步操作，或者限制写的量/比例。</p>
+<p>比如扣减库存一般这样操作：<br>方案1：<br>1、扣减DB库存，2、扣减成功后更新Redis中的库存；</p>
+<p>方案2：<br>1、扣减Redis库存，2、同步扣减DB库存，如果扣减失败则回滚Redis库存；<br>前两种方案非常依赖DB，假设此时DB性能跟不上则扣减库存就会遇到问题；</p>
+<p>方案3：<br>1、扣减Redis库存，2、正常同步扣减DB库存，性能扛不住时降级为发送一条扣减DB库存的消息，然后异步进行DB库存扣减实现最终一致即可；<br>这种方式发送扣减DB库存消息也可能成为瓶颈；</p>
+<p>方案4：<br>1、扣减Redis库存，2、正常同步扣减DB库存，性能扛不住时降级为写扣减DB库存消息到本机，然后本机通过异步进行DB库存扣减来实现最终一致性。</p>
+<p>也就是说正常情况可以同步扣减库存，在性能扛不住时降级为异步；另外如果是秒杀场景可以直接降级为异步，从而保护系统。还有如下单操作可以在大促时暂时降级将下单数据写入Redis，然后等峰值过去了再同步回DB，当然也有更好的解决方案，但是更复杂，不是本文的重点。<br>还有如用户评价，如果评价量太大，也可以把评价从同步写降级为异步写。当然也可以对评价按钮进行按比例开放（比如一些人的看不到评价操作按钮）。比如评价成功后会发一些奖励，在必要的时候降级同步到异步。</p>
+<h1 id="多级降级"><a href="#多级降级" class="headerlink" title="多级降级"></a>多级降级</h1><p>缓存是离用户最近越高效；而降级是离用户越近越能对系统保护的好。因为业务的复杂性导致越到后端QPS/TPS越低。</p>
+<p>页面JS降级开关：主要控制页面功能的降级，在页面中通过JS脚本部署功能降级开关，在适当时机开启/关闭开关；</p>
+<p>接入层降级开关：主要控制请求入口的降级，请求进入后会首先进入接入层，在接入层可以配置功能降级开关，可以根据实际情况进行自动/人工降级；这个可以参考《京东商品详情页服务闭环实践》，尤其在后端应用服务出问题时，通过接入层降级从而给应用服务有足够的时间恢复服务；<br>应用层降级开关：主要控制业务的降级，在应用中配置相应的功能开关，根据实际业务情况进行自动/人工降级。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>降级按照是否自动化可分为：自动开关降级和人工开关降级。<br>降级按照功能可分为：读服务降级、写服务降级。<br>降级按照处于的系统层次可分为：多级降级。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/架构/" rel="tag"># 架构</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/01/dislock/" rel="next" title="分布式锁">
+                <i class="fa fa-chevron-left"></i> 分布式锁
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/08/09/dacu/" rel="prev" title="应对大流量的准备工作">
+                应对大流量的准备工作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">88</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">24</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/awangdev/LintCode" title="LintCode" target="_blank">LintCode</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#降级预案"><span class="nav-number">2.</span> <span class="nav-text">降级预案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#超时降级"><span class="nav-number">3.</span> <span class="nav-text">超时降级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#故障降级"><span class="nav-number">4.</span> <span class="nav-text">故障降级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#限流降级"><span class="nav-number">5.</span> <span class="nav-text">限流降级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#人工开关降级"><span class="nav-number">6.</span> <span class="nav-text">人工开关降级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#读服务降级"><span class="nav-number">7.</span> <span class="nav-text">读服务降级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#写服务降级"><span class="nav-number">8.</span> <span class="nav-text">写服务降级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多级降级"><span class="nav-number">9.</span> <span class="nav-text">多级降级</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">10.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
