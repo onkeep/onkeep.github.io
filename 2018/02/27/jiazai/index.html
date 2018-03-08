@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Tomcat," />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="ContainerBackgroundProcessor产生先看看这个线程是如何产生的，其实从命名就可以看出一些端倪，它叫做容器后台处理器，并且跟StandardEngine关联起来，它的产生于作用也同样如此。Tomcat7中所有的默认容器组件（StandardEngine、StandardHost、StandardContext、StandardWrapper）都会继承父类org.apache.">
+<meta name="keywords" content="Tomcat">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tomcat web应用加载原理">
+<meta property="og:url" content="http://yoursite.com/2018/02/27/jiazai/index.html">
+<meta property="og:site_name" content="Para Li&#39;s Tech Blog">
+<meta property="og:description" content="ContainerBackgroundProcessor产生先看看这个线程是如何产生的，其实从命名就可以看出一些端倪，它叫做容器后台处理器，并且跟StandardEngine关联起来，它的产生于作用也同样如此。Tomcat7中所有的默认容器组件（StandardEngine、StandardHost、StandardContext、StandardWrapper）都会继承父类org.apache.">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-03-08T07:12:49.204Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tomcat web应用加载原理">
+<meta name="twitter:description" content="ContainerBackgroundProcessor产生先看看这个线程是如何产生的，其实从命名就可以看出一些端倪，它叫做容器后台处理器，并且跟StandardEngine关联起来，它的产生于作用也同样如此。Tomcat7中所有的默认容器组件（StandardEngine、StandardHost、StandardContext、StandardWrapper）都会继承父类org.apache.">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/27/jiazai/"/>
+
+
+
+
+
+  <title>Tomcat web应用加载原理 | Para Li's Tech Blog</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Para Li's Tech Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Work won't kill but worry will</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/27/jiazai/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Para Li">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Para Li's Tech Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tomcat web应用加载原理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-27T10:27:00+08:00">
+                2018-02-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Tomcat/" itemprop="url" rel="index">
+                    <span itemprop="name">Tomcat</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="ContainerBackgroundProcessor产生"><a href="#ContainerBackgroundProcessor产生" class="headerlink" title="ContainerBackgroundProcessor产生"></a>ContainerBackgroundProcessor产生</h1><p>先看看这个线程是如何产生的，其实从命名就可以看出一些端倪，它叫做容器后台处理器，并且跟StandardEngine关联起来，它的产生于作用也同样如此。<br>Tomcat7中所有的默认容器组件（StandardEngine、StandardHost、StandardContext、StandardWrapper）都会继承父类org.apache.catalina.core.ContainerBase，在这些容器组件启动时将会调用自己内部的startInternal方法，在该方法内部一般会调用父类的startInternal方法（StandardContext类的实现除外），比如org.apache.catalina.core.StandardEngine类中的startInternal方法：<br><a id="more"></a></p>
+<h2 id="StandardEngine类中的startInternal方法"><a href="#StandardEngine类中的startInternal方法" class="headerlink" title="StandardEngine类中的startInternal方法"></a>StandardEngine类中的startInternal方法</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">startInternal</span><span class="params">()</span> <span class="keyword">throws</span> LifecycleException </span>&#123;  </span><br><span class="line">      </span><br><span class="line">    <span class="comment">// Log our server identification information  </span></span><br><span class="line">    <span class="keyword">if</span>(log.isInfoEnabled())  </span><br><span class="line">        log.info( <span class="string">"Starting Servlet Engine: "</span> + ServerInfo.getServerInfo());  </span><br><span class="line">  </span><br><span class="line">    <span class="comment">// Standard container startup  </span></span><br><span class="line">    <span class="keyword">super</span>.startInternal();  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="ContainerBase的startInternal方法"><a href="#ContainerBase的startInternal方法" class="headerlink" title="ContainerBase的startInternal方法"></a>ContainerBase的startInternal方法</h2><p>最后的super.startInternal()即调用父类org.apache.catalina.core.ContainerBase的startInternal方法，在该方法最后<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (pipeline <span class="keyword">instanceof</span> Lifecycle)  </span><br><span class="line">    ((Lifecycle) pipeline).start();  </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">setState(LifecycleState.STARTING);  </span><br><span class="line">  </span><br><span class="line"><span class="comment">// Start our thread  </span></span><br><span class="line">threadStart();</span><br></pre></td></tr></table></figure></p>
+<h2 id="ContainerBackgroundProcessor线程启动了"><a href="#ContainerBackgroundProcessor线程启动了" class="headerlink" title="ContainerBackgroundProcessor线程启动了"></a>ContainerBackgroundProcessor线程启动了</h2><p>第6行设置了LifecycleState.STARTING状态（这样将向容器发布一个Lifecycle.START_EVENT事件），这一行的作用本文后面会提到，暂且按下不表。第9行调用threadStart方法，看看threadStart方法的代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">threadStart</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">if</span> (thread != <span class="keyword">null</span>)  </span><br><span class="line">        <span class="keyword">return</span>;  </span><br><span class="line">    <span class="keyword">if</span> (backgroundProcessorDelay &lt;= <span class="number">0</span>)  </span><br><span class="line">        <span class="keyword">return</span>;  </span><br><span class="line">  </span><br><span class="line">    threadDone = <span class="keyword">false</span>;  </span><br><span class="line">    String threadName = <span class="string">"ContainerBackgroundProcessor["</span> + toString() + <span class="string">"]"</span>;  </span><br><span class="line">    thread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> ContainerBackgroundProcessor(), threadName);  </span><br><span class="line">    thread.setDaemon(<span class="keyword">true</span>);  </span><br><span class="line">    thread.start();  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里可以看到如果两个前置校验条件通过的话将会启动一个线程，并且线程的名字即以” ContainerBackgroundProcessor”开头，线程名字后面取的是对象的toString方法，以StandardEngine为例，看看org.apache.catalina.core.StandardEngine的toString方法实现：<br>但这里有一个问题，既然StandardEngine、StandardHost都会调用super.startInternal()方法，按默认配置，后台理应产生两个后台线程，实际为什么只有一个？<br>回到org.apache.catalina.core.ContainerBase的threadStart方法，在启动线程代码之前有两个校验条件：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (thread != <span class="keyword">null</span>)  </span><br><span class="line">    <span class="keyword">return</span>;  </span><br><span class="line"><span class="keyword">if</span> (backgroundProcessorDelay &lt;= <span class="number">0</span>)  </span><br><span class="line">    <span class="keyword">return</span>;</span><br></pre></td></tr></table></figure></p>
+<p>容器组件对象初始化时thread为null，backgroundProcessorDelay是-1<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * The background thread. </span></span><br><span class="line"><span class="comment"> */</span>  </span><br><span class="line"><span class="keyword">private</span> Thread thread = <span class="keyword">null</span>;  </span><br><span class="line">  </span><br><span class="line"><span class="comment">/** </span></span><br><span class="line"><span class="comment"> * The processor delay for this component. </span></span><br><span class="line"><span class="comment"> */</span>  </span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">int</span> backgroundProcessorDelay = -<span class="number">1</span>;</span><br></pre></td></tr></table></figure></p>
+<p>但org.apache.catalina.core.StandardEngine在其自身构造函数中做了一点修改：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">StandardEngine</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    <span class="keyword">super</span>();  </span><br><span class="line">    pipeline.setBasic(<span class="keyword">new</span> StandardEngineValve());  </span><br><span class="line">    <span class="comment">/* Set the jmvRoute using the system property jvmRoute */</span>  </span><br><span class="line">    <span class="keyword">try</span> &#123;  </span><br><span class="line">        setJvmRoute(System.getProperty(<span class="string">"jvmRoute"</span>));  </span><br><span class="line">    &#125; <span class="keyword">catch</span>(Exception ex) &#123;  </span><br><span class="line">        log.warn(sm.getString(<span class="string">"standardEngine.jvmRouteFail"</span>));  </span><br><span class="line">    &#125;  </span><br><span class="line">    <span class="comment">// By default, the engine will hold the reloading thread  </span></span><br><span class="line">    backgroundProcessorDelay = <span class="number">10</span>;  </span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>构造函数最后将父类的backgroundProcessorDelay的值由-1改成了10，所以Tomcat启动解析xml时碰到一个Engine节点就会对应产生一个后台处理线程。</p>
+<h1 id="线程应用"><a href="#线程应用" class="headerlink" title="线程应用"></a>线程应用</h1><p>讲完了这个后台处理线程的产生，看看这个线程所作的事情，再看下这个线程的启动代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">thread = <span class="keyword">new</span> Thread(<span class="keyword">new</span> ContainerBackgroundProcessor(), threadName);  </span><br><span class="line">thread.setDaemon(<span class="keyword">true</span>);  </span><br><span class="line">thread.start();</span><br></pre></td></tr></table></figure></p>
+<p>所以这个线程将会执行ContainerBase的内部类ContainerBackgroundProcessor的run方法，看下ContainerBackgroundProcessor的全部实现代码：</p>
+<h2 id="backgroundProcess方法、processChildren方法"><a href="#backgroundProcess方法、processChildren方法" class="headerlink" title="backgroundProcess方法、processChildren方法"></a>backgroundProcess方法、processChildren方法</h2><p>在它的run方法暂停一段时间之后会调用processChildren方法，而processChildren方法做了两件事，一是调用容器组件自身的backgroundProcess方法，而是取出该容器组件的所有子容器组件并调用它们的processChildren方法。归结起来这个线程的实现就是定期通过递归的方式调用当前容器及其所有子容器的backgroundProcess方法。<br>而这个backgroundProcess方法在ContainerBase内部已经给出了实现：</p>
+<h2 id="lifecycleEvent方法中可以看到如果Host组件收到了Lifecycle-PERIODIC-EVENT事件的发布所作出的响应"><a href="#lifecycleEvent方法中可以看到如果Host组件收到了Lifecycle-PERIODIC-EVENT事件的发布所作出的响应" class="headerlink" title="lifecycleEvent方法中可以看到如果Host组件收到了Lifecycle.PERIODIC_EVENT事件的发布所作出的响应"></a>lifecycleEvent方法中可以看到如果Host组件收到了Lifecycle.PERIODIC_EVENT事件的发布所作出的响应</h2><p>回到本文要解答的问题，web应用如何加载到容器中的？在ContainerBase类的backgroundProcess方法的最后：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fireLifecycleEvent(Lifecycle.PERIODIC_EVENT, <span class="keyword">null</span>);</span><br></pre></td></tr></table></figure></p>
+<p>向容器注册了一个PERIODIC_EVENT事件。前面说道默认的<br>ContainerBackgroundProcessor StandardEngine Catalina线程会定期（默认为10秒）执行Engine、Host、Context、Wrapper各容器组件及与它们相关的其它组件的backgroundProcess方法，所以也会定期向Host组件发布一个PERIODIC_EVENT事件，这里看下StandardHost都会关联的一个监听器org.apache.catalina.startup.HostConfig（<br>在Tomcat启动解析xml时org.apache.catalina.startup.Catalina类的386行：digester.addRuleSet(new HostRuleSet(“Server/Service/Engine/“))<br>在HostRuleSet类的addRuleInstances方法中：<br>第9到12行看到，所有Host节点都会添加一个org.apache.catalina.startup.HostConfig对象作为org.apache.catalina.core.StandardHost对象的监听器<br>），在HostConfig的lifecycleEvent方法中可以看到如果Host组件收到了Lifecycle.PERIODIC_EVENT事件的发布所作出的响应</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Process the event that has occurred  </span></span><br><span class="line">    <span class="keyword">if</span> (event.getType().equals(Lifecycle.PERIODIC_EVENT)) &#123;  </span><br><span class="line">        check();  </span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType().equals(Lifecycle.START_EVENT)) &#123;  </span><br><span class="line">        start();  </span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (event.getType().equals(Lifecycle.STOP_EVENT)) &#123;  </span><br><span class="line">        stop();  </span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="check方法和start方法最后都会调用deployApps-方法"><a href="#check方法和start方法最后都会调用deployApps-方法" class="headerlink" title="check方法和start方法最后都会调用deployApps()方法"></a>check方法和start方法最后都会调用deployApps()方法</h2><p>第17行，如果发布的事件是PERIODIC_EVENT将会执行check方法。第19行，如果发布的事件是START_EVENT则执行start方法。check方法和start方法最后都会调用deployApps()方法，看下这方法的实现：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">deployApps</span><span class="params">()</span> </span>&#123;  </span><br><span class="line">  </span><br><span class="line">    File appBase = appBase();  </span><br><span class="line">    File configBase = configBase();  </span><br><span class="line">    String[] filteredAppPaths = filterAppPaths(appBase.list());  </span><br><span class="line">    <span class="comment">// Deploy XML descriptors from configBase  </span></span><br><span class="line">    deployDescriptors(configBase, configBase.list());  </span><br><span class="line">    <span class="comment">// Deploy WARs  </span></span><br><span class="line">    deployWARs(appBase, filteredAppPaths);  </span><br><span class="line">    <span class="comment">// Deploy expanded folders  </span></span><br><span class="line">    deployDirectories(appBase, filteredAppPaths);  </span><br><span class="line">  </span><br><span class="line">&#125;  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (host.getDeployOnStartup())  </span><br><span class="line">    deployApps();</span><br></pre></td></tr></table></figure></p>
+<p>因为默认配置host.getDeployOnStartup()返回true，这样容器就会在启动的时候直接加载相应的web应用。</p>
+<p>当然，如果在server.xml中Host节点的deployOnStartup属性设置为false，则容器启动时不会加载应用，启动完    之后不能立即提供web应用的服务。但因为有上面提到的后台处理线程在运行，会定期执行HostConfig的check方法：</p>
+<h2 id="部署应用有三种方式：XML文件描述符、WAR包、文件目录"><a href="#部署应用有三种方式：XML文件描述符、WAR包、文件目录" class="headerlink" title="部署应用有三种方式：XML文件描述符、WAR包、文件目录"></a>部署应用有三种方式：XML文件描述符、WAR包、文件目录</h2><p>可以看到这里部署应用有三种方式：XML文件描述符、WAR包、文件目录。三种方式部署的总体流程很相似，都是一个web应用分配一个线程来处理，这里统一放到与Host内部的线程池对象中（startStopExecutor），所以有时会看到在默认配置下Tomcat启动后可能有一个叫“-startStop-”的线程还会运行一段时间才结束。但浏览这三种部署方式的实现代码，里面都是构建一个Context对象，并将构建好的Context对象与Host组件关联起来（即调用host.addChild(context)这句，具体代码在HostConfig类的deployDescriptor(ContextName cn, File contextXml)、deployDirectory(ContextName cn, File dir)、deployWAR(ContextName cn, File war)三个方法中，这里不再贴出代码来详细分析）。<br>前一篇文章只分析到这步，可以看出与一个web应用相对应的一个Context对象已经构建出来了，但如果容器只执行到这里根本无法响应一个浏览器的一次请求。就web服务器的实现来看一次请求过来除了需要根据内部Context构建找到这次请求访问的web应用具体所对应的Context对象，还需要包含web应用中具体的哪个Servlet来处理这次请求，中间是否还需要执行相应的过滤器(filter)、监听器(listener)等，做过java的web开发的都知道，这些信息是配置在一个web应用的WEB-INF\web.xml文件的（servlet3中已经支持将这些配置信息放到Java文件的注解中，但万变不离其宗，总归要在web应用的某个地方说明，并在容器启动时加载，这样才能真正提供web服务，响应请求）。</p>
+<p>看到这里可以猜到Tomcat容器加载web应用时必定会有对于每个应用的web.xml文件的解析过程，本文就来看看这个解析过程。</p>
+<p>在本文开头提到的三种部署应用的实现代码中有一些共通的代码，这里摘出来说明一下：</p>
+<h2 id="StandardHost的addChild方法"><a href="#StandardHost的addChild方法" class="headerlink" title="StandardHost的addChild方法"></a>StandardHost的addChild方法</h2><p>Class&lt;?&gt; clazz = Class.forName(host.getConfigClass());<br>LifecycleListener listener =<br>    (LifecycleListener) clazz.newInstance();<br>context.addLifecycleListener(listener);<br>Java代码  </p>
+<p>host.addChild(context);<br>第一段是在所有Context对象构建时会添加一个监听器，这里监听器的类名是StandardHost类的实例变量configClass，其默认值就是org.apache.catalina.startup.ContextConfig。第二段是将当前构建的Context对象添加到父容器Host对象中。<br>先看下StandardHost的addChild方法的实现：</p>
+<h2 id="调用StandardContext的start方法"><a href="#调用StandardContext的start方法" class="headerlink" title="调用StandardContext的start方法"></a>调用StandardContext的start方法</h2><p>与Context的start方法调用相关的事件监听前后顺序为：AFTER_INIT_EVENT（执行init方法）、BEFORE_START_EVENT（执行beforeStart方法）、CONFIGURE_START_EVENT（执行configureStart方法）。</p>
+<h2 id="configureStart方法解析web-xml文件"><a href="#configureStart方法解析web-xml文件" class="headerlink" title="configureStart方法解析web.xml文件"></a>configureStart方法解析web.xml文件</h2><p>在configureStart方法将直接调用webConfig方法，正是在这个方法中将会解析web.xml文件：<br>解析出的各种配置信息（如servlet配置、filter配置等）关联到Context对象中（在上面的代码第140行：</p>
+<h2 id="webXml-configureContext-context-）"><a href="#webXml-configureContext-context-）" class="headerlink" title="webXml.configureContext(context)）"></a>webXml.configureContext(context)）</h2><p>可以看到里面对context调用了各种set、add方法，从而将web.xml中的各种配置信息与表示一个web应用的context对象关联起来。</p>
+<h2 id="Servlet、Listener、Filter的关联"><a href="#Servlet、Listener、Filter的关联" class="headerlink" title="Servlet、Listener、Filter的关联"></a>Servlet、Listener、Filter的关联</h2><p>分析到了org.apache.catalina.deploy.WebXml类的configureContext方法，可以看到在这个方法中通过各种setXXX、addXXX方法的调用，使得每个应用中的web.xml文件的解析后将应用内部的表示Servlet、Listener、Filter的配置信息与表示一个web应用的Context对象关联起来。<br>这里仅仅是将这些配置信息保存到了StandardContext的相应实例变量中，真正在一次请求访问中用到的Servlet、Listener、Filter的实例并没有构造出来，以上方法调用仅构造了代表这些实例的封装类的实例，如StandardWrapper、ApplicationListener、FilterDef、FilterMap。</p>
+<p>StandardContext类的startInternal方法<br>第237行会调用listenerStart方法，第255行调用了filterStart方法，第263行调用了loadOnStartup方法，这三处调用即触发Listener、Filter、Servlet真正对象的构造</p>
+<h2 id="listenerStart构造Listener对象"><a href="#listenerStart构造Listener对象" class="headerlink" title="listenerStart构造Listener对象"></a>listenerStart构造Listener对象</h2><p>先从Context对象中取出实例变量applicationListeners（该变量的值在web.xml解析时设置），第12行通过调用instanceManager.newInstance(listener.getClassName())，前面在看StandardContext的startInternal方法第205行时看到instanceManager被设置为DefaultInstanceManager对象，所以这里实际会执行DefaultInstanceManager类的newInstance方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">newInstance</span><span class="params">(String className)</span> <span class="keyword">throws</span> IllegalAccessException, InvocationTargetException, NamingException, InstantiationException, ClassNotFoundException </span>&#123;  </span><br><span class="line">    Class&lt;?&gt; clazz = loadClassMaybePrivileged(className, classLoader);  </span><br><span class="line">    <span class="keyword">return</span> newInstance(clazz.newInstance(), clazz);  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>所以instanceManager.newInstance(listener.getClassName())这段代码的作用是取出web.xml中配置的Listener的class配置信息，从而构造实际配置的Listener对象。</p>
+<h2 id="filterStart"><a href="#filterStart" class="headerlink" title="filterStart"></a>filterStart</h2><p>取出web.xml解析时读到的filter配置信息，在第17行调用ApplicationFilterConfig了构造方法：<br>与Listener的对象构造类似，都是通过调用getInstanceManager().newInstance方法。当然，按照Servlet规范，第13行还会调用Filter的init方法。</p>
+<h2 id="loadOnStartup"><a href="#loadOnStartup" class="headerlink" title="loadOnStartup"></a>loadOnStartup</h2><p>在web应用启动时将会加载配置了load-on-startup属性的Servlet。第24行，调用了StandardWrapper类的load方法：在第2行loadServlet方法中与上面的Listener和Filter对象构造一样调用instanceManager.newInstance来构造Servlet对象，与Filter类似在第5行调用Servlet的init方法。<br>当然，这种加载只是针对配置了load-on-startup属性的Servlet而言，其它一般Servlet的加载和初始化会推迟到真正请求访问web应用而第一次调用该Servlet时，下面会看到这种情况下代码分析。</p>
+<h1 id="请求访问时"><a href="#请求访问时" class="headerlink" title="请求访问时"></a>请求访问时</h1><p>以上分析的web应用启动后这些对象的加载情况，接下来分析一下一次请求访问时，相关的Filter、Servlet对象的调用。<br>StandardWrapperValve的invoke方法<br>关注重点第42行，这里会调用StandardWrapper的allocate方法，不再贴出这个方法的代码，需要提醒的是在allocate方法中可能会调用loadServlet()方法，这就是上一段提到的请求访问web应用而第一次调用该Servlet时再加载并初始化Servlet。<br>第87到91行会构造一个过滤器链（filterChain）用于执行这一次请求所经过的相应Filter，第111和第128行会调用该filterChain的doFilter方法：在该方法最后调用了internalDoFilter方法，在接下来的第92行、第95行即调用Servlet的service方法。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+      <div>
+        <div id="wechat_subscriber" style="display: block; padding: 10px 0; margin: 20px auto; width: 100%; text-align: center">
+    <img id="wechat_subscriber_qcode" src="/images/qrcode.jpg" alt="Para Li wechat" style="width: 200px; max-width: 100%;"/>
+    <div>欢迎关注我的微信公众号，订阅我的文章</div>
+</div>
+
+      </div>
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Tomcat/" rel="tag"># Tomcat</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/20/ribbon/" rel="next" title="Ribbon介绍">
+                <i class="fa fa-chevron-left"></i> Ribbon介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.png"
+                alt="Para Li" />
+            
+              <p class="site-author-name" itemprop="name">Para Li</p>
+              <p class="site-description motion-element" itemprop="description">Plain living and high thinking</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives">
+              
+                  <span class="site-state-item-count">92</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">12</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">25</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/onkeep" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:lixuemeng1026@163.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://weibo.com/u/1910561771" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-weibo"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://douban.com/people/90978448" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-star"></i>豆瓣</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://github.com/awangdev/LintCode" title="LintCode" target="_blank">LintCode</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://tech.meituan.com/" title="mTech" target="_blank">mTech</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://ifeve.com/" title="ifeve" target="_blank">ifeve</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.importnew.com/" title="importnew" target="_blank">importnew</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ContainerBackgroundProcessor产生"><span class="nav-number">1.</span> <span class="nav-text">ContainerBackgroundProcessor产生</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#StandardEngine类中的startInternal方法"><span class="nav-number">1.1.</span> <span class="nav-text">StandardEngine类中的startInternal方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ContainerBase的startInternal方法"><span class="nav-number">1.2.</span> <span class="nav-text">ContainerBase的startInternal方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ContainerBackgroundProcessor线程启动了"><span class="nav-number">1.3.</span> <span class="nav-text">ContainerBackgroundProcessor线程启动了</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#线程应用"><span class="nav-number">2.</span> <span class="nav-text">线程应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#backgroundProcess方法、processChildren方法"><span class="nav-number">2.1.</span> <span class="nav-text">backgroundProcess方法、processChildren方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lifecycleEvent方法中可以看到如果Host组件收到了Lifecycle-PERIODIC-EVENT事件的发布所作出的响应"><span class="nav-number">2.2.</span> <span class="nav-text">lifecycleEvent方法中可以看到如果Host组件收到了Lifecycle.PERIODIC_EVENT事件的发布所作出的响应</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#check方法和start方法最后都会调用deployApps-方法"><span class="nav-number">2.3.</span> <span class="nav-text">check方法和start方法最后都会调用deployApps()方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#部署应用有三种方式：XML文件描述符、WAR包、文件目录"><span class="nav-number">2.4.</span> <span class="nav-text">部署应用有三种方式：XML文件描述符、WAR包、文件目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#StandardHost的addChild方法"><span class="nav-number">2.5.</span> <span class="nav-text">StandardHost的addChild方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用StandardContext的start方法"><span class="nav-number">2.6.</span> <span class="nav-text">调用StandardContext的start方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#configureStart方法解析web-xml文件"><span class="nav-number">2.7.</span> <span class="nav-text">configureStart方法解析web.xml文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#webXml-configureContext-context-）"><span class="nav-number">2.8.</span> <span class="nav-text">webXml.configureContext(context)）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Servlet、Listener、Filter的关联"><span class="nav-number">2.9.</span> <span class="nav-text">Servlet、Listener、Filter的关联</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#listenerStart构造Listener对象"><span class="nav-number">2.10.</span> <span class="nav-text">listenerStart构造Listener对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#filterStart"><span class="nav-number">2.11.</span> <span class="nav-text">filterStart</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#loadOnStartup"><span class="nav-number">2.12.</span> <span class="nav-text">loadOnStartup</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#请求访问时"><span class="nav-number">3.</span> <span class="nav-text">请求访问时</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Para Li</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
